@@ -1,5 +1,4 @@
 package game;
-import game.PlayerType;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +13,7 @@ public class GameGUI {
 	private JButton lastSelection = null;
 
 	public static void main(String[] args) {
-		GameGUI gui = new GameGUI();
+		new GameGUI();
 	}
 
 	public GameGUI() {
@@ -22,6 +21,7 @@ public class GameGUI {
 		JFrame guiFrame = new JFrame();
 		// make sure the program exits when the frame closes
 		guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		guiFrame.setMinimumSize(new Dimension(700,700));
 		guiFrame.setTitle("Chess");
 		guiFrame.setSize(800, 600);
 		// This will center the JFrame in the middle of the screen
@@ -218,14 +218,19 @@ public class GameGUI {
 						button.setIcon(new ImageIcon(whiteKing));
 					}
 
-					button.setBorderPainted(true);
+					button.setBorderPainted(false);
 					button.setPreferredSize(new Dimension(80, 80));
+					if ((row+col)%2!=0)
+					{
 					button.setBackground(java.awt.Color.white);
+					}
+					else
+					{
+						button.setBackground(new Color(29,114,46));
+					}
 					MyActionListener mal = new MyActionListener();
 					button.addActionListener(mal);
 					add(button, gbc);
-
-					// cellPane.setBorder(border);
 
 				}
 			}
