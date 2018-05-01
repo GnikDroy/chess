@@ -1,10 +1,24 @@
 package game;
 import pieces.*;
 import java.util.*;
+/**
+ * @author Gnik
+ *
+ */
 public class Board {
+	/**
+	 * This contains all the squares on the board in a 2D array 
+	 */
 	private Square[][] squares=new Square[8][8];
+	
+	/**
+	 * This is the List of all capturedPieces.
+	 */
 	private List<Piece> capturedPieces=new ArrayList<Piece>(16*2-2);
 	
+	/**
+	 * This initialized the board to it's original position.
+	 */
 	public Board()
 	{
 		setSquares();
@@ -13,12 +27,18 @@ public class Board {
 		
 	}
 	
+	/**
+	 * Resets the board to it's original position
+	 */
 	public void resetBoard(){
 		setSquares();
 		setWhitePieces();
 		setBlackPieces();
 	}
 	
+	/**
+	 * Initializes all the squares
+	 */
 	private void setSquares(){
 		for (int x=0;x<8;x++)
 		{
@@ -29,6 +49,9 @@ public class Board {
 		}
 		
 	}
+	/**
+	 * Initializes and assigns all white Pieces.
+	 */
 	private void setWhitePieces(){
 		squares[2][0].setPiece(new Bishop(PlayerType.WHITE));
 		squares[5][0].setPiece(new Bishop(PlayerType.WHITE));
@@ -48,6 +71,9 @@ public class Board {
 		squares[7][1].setPiece(new Pawn(PlayerType.WHITE));
 		
 	}
+	/**
+	 * Initializes and sets all Black Pieces.
+	 */
 	private void setBlackPieces(){
 		squares[2][7].setPiece(new Bishop(PlayerType.BLACK));
 		squares[5][7].setPiece(new Bishop(PlayerType.BLACK));
@@ -69,11 +95,20 @@ public class Board {
 	}
 	
 	
+	/**
+	 * Returns all the squares on the board. 
+	 * @return Square[][]
+	 */
 	public Square[][] getSquares(){
 		return squares;
 	}
 	
 	
+	/**
+	 * This gets the square with a specific coordinate.
+	 * @param coordinate
+	 * @return
+	 */
 	public Square getSquare(Coordinate coordinate){
 		Square result=null;
 		for (int x=0;x<8;x++)
@@ -90,6 +125,11 @@ public class Board {
 	
 	//Make sure you call is valid move first.
 	//This does not check if the move is valid
+	/**
+	 * This makes a move from a square to another. **Move may be invalid**
+	 * @param s1
+	 * @param s2
+	 */
 	public void makeMove(Square s1,Square s2){
 		//Has a piece been captured;
 		if(s2.isOccupied())
@@ -105,6 +145,9 @@ public class Board {
 
 	}
 	
+	/**
+	 * This prints the board in the command line.
+	 */
 	public void printBoard(){
 		for (int y=7;y>=0;y--){
 			for(int x=0;x<8;x++)

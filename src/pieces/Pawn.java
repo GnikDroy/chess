@@ -19,7 +19,6 @@ public class Pawn extends Piece {
 		if (Math.abs(initPos.getY()-finalPos.getY())==1 &&
 			Math.abs(initPos.getX()-finalPos.getX())==0)
 			{
-				System.out.println(initPos.toString()+finalPos);
 				//White can only move forward
 				if (this.getPlayer()==PlayerType.WHITE){
 					if(initPos.getY()<finalPos.getY()){
@@ -67,5 +66,6 @@ public class Pawn extends Piece {
 	public Coordinate[] getPath(Coordinate initPos,Coordinate finalPos) {
 		return new Coordinate[]{initPos,finalPos};
 	}
+
 
 }
