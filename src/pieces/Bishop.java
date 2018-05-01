@@ -31,12 +31,14 @@ public class Bishop extends Piece{
 		//In this case i am considering initPos as the first point and finalPos as second
 		int i_X=Integer.signum(finalPos.getX()-initPos.getX());
 		int i_Y=Integer.signum(finalPos.getY()-initPos.getY());
-		
+
 		for (int cnt=0;cnt<pathLength;cnt++)
 		{
-			path[cnt]=new Coordinate(initPos.getY()+i_X*cnt,initPos.getY()+i_Y*cnt);
+			path[cnt]=new Coordinate(initPos.getX()+i_X*cnt,initPos.getY()+i_Y*cnt);
 		}
-		
+
+
+		for (Coordinate c:path) {System.out.println(c);}
 		
 		return path;
 	}

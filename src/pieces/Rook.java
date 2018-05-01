@@ -31,10 +31,10 @@ public class Rook extends Piece{
 		for (int cnt=0;cnt<pathLength;cnt++)
 		{
 			if ((initPos.getX()==finalPos.getX())){
-				path[cnt]=new Coordinate(initPos.getX(),Math.min(initPos.getY(),finalPos.getY())+1);
+				path[cnt]=new Coordinate(initPos.getX(),Math.min(initPos.getY(),finalPos.getY())+cnt);
 			}
 			else{
-				path[cnt]=new Coordinate(Math.min(initPos.getX(),finalPos.getX())+1,initPos.getY());
+				path[cnt]=new Coordinate(Math.min(initPos.getX(),finalPos.getX())+cnt,initPos.getY());
 			}
 		}
 		return path;

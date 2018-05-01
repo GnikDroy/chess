@@ -1,23 +1,35 @@
 package game;
 import pieces.Piece;
+import game.PlayerType;
 
 public class BoardManager {
 	private Board board;
-	
+	private PlayerType currentPlayer=PlayerType.WHITE;
 	public BoardManager(){
 		this.board=new Board();
 	}
-	
+	private void switchCurrentPlayer()
+	{
+		if (currentPlayer==PlayerType.WHITE){currentPlayer=PlayerType.BLACK;}
+		else{currentPlayer=PlayerType.WHITE;}
+		
+	}
+	public PlayerType getCurrentPlayer(){return currentPlayer;}
 	public Board getBoard(){return board;}
 	
-	public boolean move(Square s1,Square s2)
+	public boolean move(Coordinate c1,Coordinate c2)
 	{
-		if (isValidMove(s1,s2)){
+		if (c1==null || c2==null){return false;}
+		Square s1=board.getSquare(c1);
+		Square s2=board.getSquare(c2);
+		if (isValidMove(s1,s2) && currentPlayer==s1.getPiece().getPlayer()){
+			switchCurrentPlayer();
 			board.makeMove(s1, s2);
 			return true;
 		}
-		return false;
-	}
+		return false;	}
+	
+	
 	public boolean isPathClear(Coordinate[] path,Coordinate initPos,Coordinate finalPos)
 	{
 		Square[][] squares=board.getSquares();
@@ -99,13 +111,11 @@ public class BoardManager {
 			}
 		return false;
 	}
-	private boolean isValidCastling(Square s1,Square s2){
-		return false;
-		}
+
 	public boolean isValidMove(Square s1,Square s2)
 	{
-		if (!isWithinBounds(s1,s2)) return false; //If the move is out of bounds
-		if (!s1.isOccupied()) return false; //If the player tries to move a empty square.
+		if (!isWithinBounds(s1,s2)) {return false;} //If the move is out of bounds
+		if (!s1.isOccupied()) {return false;} //If the player tries to move a empty square.
 		//Moving to the square does not need to be checked since it is checked by every piece
 		
 		 //If the player tries to take his own piece.
