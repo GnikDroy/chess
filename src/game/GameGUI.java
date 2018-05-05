@@ -54,7 +54,6 @@ public class GameGUI {
 				selectionY = lastSelection.getLocation(rv).y / 80;
 				Coordinate lastCoordinate = new Coordinate(selectionX,
 						selectionY);
-				//Checks if it is the current player's piece.
 				
 				moved = boardManager.move(lastCoordinate,
 						currentCoordinate);

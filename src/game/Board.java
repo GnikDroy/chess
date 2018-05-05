@@ -6,15 +6,10 @@ import java.util.*;
  *
  */
 public class Board {
-	/**
-	 * This contains all the squares on the board in a 2D array 
-	 */
+
 	private Square[][] squares=new Square[8][8];
-	
-	/**
-	 * This is the List of all capturedPieces.
-	 */
 	private List<Piece> capturedPieces=new ArrayList<Piece>(16*2-2);
+
 	
 	/**
 	 * This initialized the board to it's original position.
@@ -123,8 +118,7 @@ public class Board {
 		return result;
 	}
 	
-	//Make sure you call is valid move first.
-	//This does not check if the move is valid
+	
 	/**
 	 * This makes a move from a square to another. **Move may be invalid**
 	 * @param s1
