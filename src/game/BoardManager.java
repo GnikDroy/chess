@@ -45,8 +45,13 @@ public class BoardManager {
 				
 		//Only the current player can move the piece.
 		if (currentPlayer == s1.getPiece().getPlayer()) {
-			
-			if (isValidMove(s1, s2)) {
+			if(isValidCastling(s1,s2))
+			{
+				switchCurrentPlayer();
+				castle(s1,s2);
+				return true;
+			}
+			else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
 				board.makeMove(s1, s2);
 				return true;
@@ -88,7 +93,6 @@ public class BoardManager {
 				}
 			}
 		}
-		
 		// Checks if there is check
 		boolean check = false;
 		for (int x = 0; x < 8; x++) {
@@ -96,14 +100,13 @@ public class BoardManager {
 				Square square = squares[x][y];
 				if (square.isOccupied()) {
 					if (square.getPiece().getPlayer() != player) {
-						// This function depends on the isValidMove function
+						// This function depends on the isValidMovement function
 						if (isValidMovement(square, squareOfKing))
 							check = true;
 					}
 				}
 			}
 		}
-
 		return check;
 	}
 
@@ -136,8 +139,56 @@ public class BoardManager {
 		}
 		return false;
 	}
+	
+	public boolean isValidCastling(Square s1, Square s2){
+		//Check if the squares are occupied.
+		if (!(s1.isOccupied() &&  s2.isOccupied())) {return false;}
+		//You cannot castle if you are in check.
 
+		if (isCheck(s1.getPiece().getPlayer())){return false;}
+
+		//Check if the path is clear
+		if (!isPathClear( s2.getPiece().getPath(s2.getCoordinate(), s1.getCoordinate()),s2.getCoordinate(),s1.getCoordinate() )){return false;}
+
+		//Now check if the movement of the castling is fine
+		if (s1.getPiece().getType()==PieceType.KING && s2.getPiece().getType()==PieceType.ROOK)
+		{
+
+			int col=0;
+			if (s1.getPiece().getPlayer()==PlayerType.BLACK){col=7;}
+			//The peices are in correct position for castling.
+
+			if (s1.getCoordinate().equals(new Coordinate(4,col)) &&
+				(s2.getCoordinate().equals(new Coordinate(0,col)) || s2.getCoordinate().equals(new Coordinate(7,col)) ))
+			{
+
+				//Check if there is check in any way between the king and rook
+				for (Coordinate coordinate:s2.getPiece().getPath(s2.getCoordinate(), s1.getCoordinate())){
+					if(s1.equals(board.getSquare(coordinate))){continue;}
+					if (moveMakesCheck(s1,board.getSquare(coordinate)) ){
+						return false;
+					}
+				}
+
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void castle(Square s1,Square s2)
+	{
+		int offset;
+		if (Math.signum(s2.getCoordinate().getX()-s1.getCoordinate().getX())==1)
+		{offset=2;}
+		else{offset=-2;}
+		int kingX=s1.getCoordinate().getX()+offset;
+		int rookX=kingX-offset/2;
+		board.makeMove(s1.getCoordinate(),new Coordinate(kingX,s1.getCoordinate().getY()));
+		board.makeMove(s2.getCoordinate(),new Coordinate(rookX,s2.getCoordinate().getY()));
+	}
 	public boolean isValidMovement(Square s1, Square s2) {
+		//I am not checking if the squares have valid coordinate because, they should have it.
 		// If the player tries to move a empty square.
 		if (!s1.isOccupied()) {
 			return false;
@@ -174,23 +225,43 @@ public class BoardManager {
 		return true;
 	}
 	
-	public boolean isValidMove(Square s1,Square s2)
-	{	
-		if(!isValidMovement(s1,s2)){return false;}
-		// If this move makes check for the moving player.
-		// If the player is in check he must move out of check.
+	public boolean moveMakesCheck(Square s1, Square s2)
+	{
 		Piece temporaryPiece = s2.getPiece();
 		s2.setPiece(s1.getPiece());
 		s1.releasePiece();
 		if (isCheck(s2.getPiece().getPlayer())) {
 			s1.setPiece(s2.getPiece());
 			s2.setPiece(temporaryPiece);
-			return false;
+			
+			return true;
 		} else {
 			s1.setPiece(s2.getPiece());
 			s2.setPiece(temporaryPiece);
 		}
+		return false;
+	}
+	
+	public boolean isValidMove(Square s1,Square s2)
+	{	
+		
+		if(!isValidMovement(s1,s2)){return false;}
+		if(moveMakesCheck(s1,s2)){return false;}	
 		return true;
+	}
+	
+	public static void main(String args[])
+	{
+		BoardManager b=new BoardManager();
+		b.move(new Coordinate(4,1), new Coordinate(4,3));
+		b.move(new Coordinate(0,6), new Coordinate(0,5));
+		b.move(new Coordinate(5,0), new Coordinate(3,2));
+		b.move(new Coordinate(0,5), new Coordinate(0,4));
+		b.move(new Coordinate(6,0), new Coordinate(5,2));
+		b.move(new Coordinate(0,4), new Coordinate(0,3));
+		boolean t=b.move(new Coordinate(4,0), new Coordinate(7,0));
+		
+		b.getBoard().printBoard();
 	}
 
 }

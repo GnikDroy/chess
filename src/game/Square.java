@@ -34,7 +34,7 @@ public class Square {
 		}
 		return piece.toString();
 	}
-	public void releasePiece(){this.piece=null;}
+	public void releasePiece(){piece=null;}
 	public void setPiece(Piece piece){
 		this.piece=piece;
 	}

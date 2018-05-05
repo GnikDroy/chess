@@ -118,7 +118,10 @@ public class Board {
 		return result;
 	}
 	
-	
+	public void makeMove(Coordinate c1,Coordinate c2)
+	{
+		makeMove(getSquare(c1),getSquare(c2));
+	}
 	/**
 	 * This makes a move from a square to another. **Move may be invalid**
 	 * @param s1
