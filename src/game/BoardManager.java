@@ -65,7 +65,7 @@ public class BoardManager {
 	}
 
 	public boolean move(Coordinate c1, Coordinate c2) {
-
+		if (!(c1.isValid()&&c2.isValid())){return false;}
 		Square s1 = board.getSquare(c1);
 		Square s2 = board.getSquare(c2);
 
@@ -83,7 +83,6 @@ public class BoardManager {
 			} else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
 				board.makeMove(s1, s2);
-				if (isValidPromotion(s2)){promote(s2,PieceType.QUEEN);};
 				return true;
 			}
 		}
