@@ -11,7 +11,9 @@ import javax.swing.border.MatteBorder;
 public class GameGUI {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
-
+	private JButton[][] allButtons=null;
+	private PlayerType perspective=PlayerType.BLACK;
+	
 	public static void main(String[] args) {
 		new GameGUI();
 	}
@@ -29,6 +31,7 @@ public class GameGUI {
 		// Options for the JComboBox
 		guiFrame.setLayout(new BorderLayout());
 		ChessWindow window = new ChessWindow();
+		allButtons=window.getButtons();
 		guiFrame.add(window);
 		guiFrame.pack();
 		window.setVisible(true);
@@ -40,6 +43,41 @@ public class GameGUI {
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
+		
+		public void updateBoard(){
+			Square[][] squares=boardManager.getBoard().getSquares();
+			for (int row=0;row<8;row++)
+			{
+				for (int col=0;col<8;col++){
+					JButton button=allButtons[col][row];
+					Square square=squares[row][col];
+					if (square.isOccupied())
+					{
+						String playerString;
+						String pieceString;
+						if (square.getPiece().getPlayer()==PlayerType.WHITE){playerString="white";}
+						else{playerString="black";}
+						if (square.getPiece().getType()==PieceType.KING){pieceString="King";}
+						else if(square.getPiece().getType()==PieceType.PAWN){pieceString="Pawn";}
+						else if(square.getPiece().getType()==PieceType.ROOK){pieceString="Rook";}
+						else if(square.getPiece().getType()==PieceType.KNIGHT){pieceString="Knight";}
+						else if(square.getPiece().getType()==PieceType.BISHOP){pieceString="Bishop";}
+						else {pieceString="Queen";}
+						
+						Image image = null;
+						try {
+							image = ImageIO.read(getClass().getResource(
+									"/"+playerString+pieceString+".png"));
+						} catch (IOException e) {
+						}
+						button.setIcon(new ImageIcon(image));
+						
+					}
+					else{button.setIcon(null);}
+				}
+			}
+			
+		}
 		public void actionPerformed(ActionEvent e) {
 			
 			JButton button = (JButton) e.getSource();
@@ -58,9 +96,7 @@ public class GameGUI {
 				moved = boardManager.move(lastCoordinate,
 						currentCoordinate);
 				if (moved) {
-					button.setIcon(lastSelection.getIcon());
-					lastSelection.setIcon(null);
-					lastSelection=null;
+					updateBoard();
 				}
 			}
 
@@ -70,6 +106,10 @@ public class GameGUI {
 	}
 
 	public class ChessWindow extends JPanel {
+		private JButton[][] allButtons=new JButton[8][8];
+		public JButton[][] getButtons(){
+			return allButtons;
+		}
 		public ChessWindow() {
 			setLayout(new GridBagLayout());
 			GridBagConstraints gbc = new GridBagConstraints();
@@ -218,6 +258,7 @@ public class GameGUI {
 					}
 
 					button.setBorderPainted(false);
+					allButtons[row][col]=button;
 					button.setPreferredSize(new Dimension(80, 80));
 					if ((row+col)%2!=0)
 					{
