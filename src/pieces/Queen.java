@@ -4,8 +4,16 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+/**
+ * @author gnik
+ *
+ */
 public class Queen extends Piece{
 
+    /**
+     * Create a Queen
+     * @param player The player the queen belongs to
+     */
     public Queen(PlayerType player){
         super(player,PieceType.QUEEN);
     }

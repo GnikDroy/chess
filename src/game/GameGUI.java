@@ -7,6 +7,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+
+/**
+ * @author gnik
+ *
+ */
 public class GameGUI {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
@@ -154,7 +159,7 @@ public class GameGUI {
 
 	public class ChessWindow extends JPanel {
 		private static final long serialVersionUID = 1L;
-		
+
 		private JButton[][] allButtons = new JButton[8][8];
 
 		public JButton[][] getButtons() {
@@ -170,7 +175,7 @@ public class GameGUI {
 					gbc.gridy = col;
 					JButton button = new JButton();
 					allButtons[col][row] = button;
-					
+
 					button.setBorderPainted(false);
 					button.setPreferredSize(new Dimension(80, 80));
 

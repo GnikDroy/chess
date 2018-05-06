@@ -6,8 +6,16 @@ import game.PlayerType;
 import game.Coordinate;
 
 
+/**
+ * @author gnik
+ *
+ */
 public class Rook extends Piece{
-
+	
+    /**
+     * Create a Rook
+     * @param player The player the rook belongs to
+     */
     public Rook(PlayerType player){
         super(player,PieceType.ROOK);
     }

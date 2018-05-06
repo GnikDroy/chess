@@ -4,8 +4,16 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+/**
+ * @author gnik
+ *
+ */
 public class Knight extends Piece {
 
+    /**
+     * Create a Knight
+     * @param player The player the Knight belongs to
+     */
     public Knight(PlayerType player){
         super(player,PieceType.KNIGHT);
     }

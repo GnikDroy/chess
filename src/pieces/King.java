@@ -5,8 +5,15 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+/**
+ * @author gnik
+ *
+ */
 public class King extends Piece{
-
+    /**
+     * Create a King
+     * @param player The player the king belongs to
+     */
     public King(PlayerType player){
         super(player,PieceType.KING);
     }

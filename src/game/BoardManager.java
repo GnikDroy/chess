@@ -3,19 +3,43 @@ package game;
 import pieces.*;
 import game.PlayerType;
 
+/**
+ * @author gnik
+ *
+ */
 public class BoardManager {
+	/**
+	 * The board object
+	 */
 	private Board board;
+	
+	/**
+	 * Current Player which is to move.
+	 * Default is PlayerType.WHITE
+	 */
 	private PlayerType currentPlayer = PlayerType.WHITE;
 
+	
+	
+	
+	/**
+	 * Constructs a new BoardManager object
+	 */
 	public BoardManager() {
 		this.board = new Board();
 	}
 
+	/**
+	 * Resets the board to it's initial state
+	 */
 	public void resetBoard() {
 		board.resetBoard();
 		currentPlayer = PlayerType.WHITE;
 	}
 
+	/**
+	 * Switches the player currently to move.
+	 */
 	private void switchCurrentPlayer() {
 		if (currentPlayer == PlayerType.WHITE) {
 			currentPlayer = PlayerType.BLACK;
@@ -25,14 +49,29 @@ public class BoardManager {
 
 	}
 
+	/**
+	 * Return the player who is to move
+	 * @return PlayerType The player
+	 */
 	public PlayerType getCurrentPlayer() {
 		return currentPlayer;
 	}
 
+	/**
+	 * Returns the board object
+	 * @return board The board object
+	 */
 	public Board getBoard() {
 		return board;
 	}
 
+	/**
+	 * Promotes a pawn to a newer piece.
+	 * Calls isValidPromotion function first
+	 * @param square Promotion Square
+	 * @param pieceType The type of piece to promote to. If none is provided it defaults to Queen.
+	 * @return boolean If the promotion was made
+	 */
 	public boolean promote(Square square, PieceType pieceType) {
 		if (isValidPromotion(square)) {
 			Piece piece;
@@ -51,6 +90,11 @@ public class BoardManager {
 		return false;
 	}
 
+	/**
+	 * Checks if the square contains a pawn that can be promoted.
+	 * @param square Square of the pawn
+	 * @return boolean If the pawn can be promoted
+	 */
 	public boolean isValidPromotion(Square square) {
 		if (!square.isOccupied() == true) {
 			return false;
@@ -69,6 +113,13 @@ public class BoardManager {
 		return false;
 	}
 
+	/**
+	 * Makes a move from initial coordinate to final one.
+	 * It calls isValidMove(),isValidCastling() and isValidEnpassant()
+	 * @param initCoordinate Initial Coordinate
+	 * @param finalCoordinate Final Coordinate
+	 * @return boolean If the move was made
+	 */
 	public boolean move(Coordinate initCoordinate, Coordinate finalCoordinate) {
 		if (!(initCoordinate.isValid() && finalCoordinate.isValid())) {
 			return false;
@@ -99,14 +150,32 @@ public class BoardManager {
 		return false;
 	}
 
+	/**
+	 * Checks if the move is valid enpassant move.
+	 * @param s1 Initial Square
+	 * @param s2 Final Square
+	 * @return boolean If enpassant valid
+	 */
 	public boolean isValidEnpassant(Square s1, Square s2) {
 		return false;
 	}
 
-	public void enpassant(Square s1, Square s2) {
+	
+	/**
+	 * Makes a Enpassant move
+	 * @param initSquare Initial Square
+	 * @param finalSquare Final Square
+	 */
+	public void enpassant(Square initSquare, Square finalSquare) {
 
 	}
 
+	/**
+	 * Checks if the given move makes check for the moving player
+	 * @param initSquare Initial Square
+	 * @param finalSquare Final Square
+	 * @return boolean If the move makes check.
+	 */
 	public boolean moveMakesCheck(Square initSquare, Square finalSquare) {
 		Piece temporaryPiece = finalSquare.getPiece();
 		finalSquare.setPiece(initSquare.getPiece());
@@ -126,8 +195,8 @@ public class BoardManager {
 	/**
 	 * Checks if there is check for the player
 	 * 
-	 * @param player
-	 * @return boolean
+	 * @param player Is this player in check
+	 * @return boolean If the player is in check
 	 */
 	public boolean isCheck(PlayerType player) {
 		Square[][] squares = board.getSquares();
@@ -161,6 +230,12 @@ public class BoardManager {
 		return check;
 	}
 
+	/**
+	 * Checks if the move is valid pawn capture move
+	 * @param initSquare Initial Square
+	 * @param finalSquare Final Square
+	 * @return boolean If the pawn capture is valid
+	 */
 	private boolean isValidPawnCapture(Square initSquare, Square finalSquare) {
 		// If the piece is not a pawn OR this is not a capture.
 		if (!finalSquare.isOccupied() || initSquare.getPiece().getType() != PieceType.PAWN) {
@@ -190,6 +265,12 @@ public class BoardManager {
 		return false;
 	}
 
+	/**
+	 * Checks if it is valid Castling move
+	 * @param kingSquare The square of the king
+	 * @param rookSquare The square of the rook
+	 * @return boolean If this is valid Castling
+	 */
 	public boolean isValidCastling(Square kingSquare, Square rookSquare) {
 		// Check if the squares are occupied.
 		if (!(kingSquare.isOccupied() && rookSquare.isOccupied())) {
@@ -253,6 +334,12 @@ public class BoardManager {
 		return false;
 	}
 
+	/**
+	 * Makes a castle move.<p>
+	 * It calls the isValidCastling() first.
+	 * @param kingSquare The square of the King
+	 * @param rookSquare The square of the Rook
+	 */
 	public void castle(Square kingSquare, Square rookSquare) {
 		int offset;
 		if (Math.signum(rookSquare.getCoordinate().getX()
@@ -269,19 +356,32 @@ public class BoardManager {
 				rookSquare.getCoordinate().getY()));
 	}
 
-	public boolean isPathClear(Coordinate[] path, Coordinate initPos,
-			Coordinate finalPos) {
+	/**
+	 * Checks if there are any obstacles between the pieces.
+	 * @param path The path between the pieces
+	 * @param initCoordinate Initial Coordinate to ignore
+	 * @param finalCoordinate Final Coordinate to ignore
+	 * @return boolean Is path clear
+	 */
+	public boolean isPathClear(Coordinate[] path, Coordinate initCoordinate,
+			Coordinate finalCoordinate) {
 		Square[][] squares = board.getSquares();
 		for (Coordinate coordinate : path) {
 			if ((squares[coordinate.getX()][coordinate.getY()].isOccupied())
-					&& (!coordinate.equals(initPos))
-					&& (!coordinate.equals(finalPos))) {
+					&& (!coordinate.equals(initCoordinate))
+					&& (!coordinate.equals(finalCoordinate))) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	/**
+	 * Checks if the piece can make a valid movement to the square.
+	 * @param initSquare Initial Square
+	 * @param finalSquare Final Square
+	 * @return boolean If movement is valid
+	 */
 	public boolean isValidMovement(Square initSquare, Square finalSquare) {
 		// I am not checking if the squares have valid coordinate because, they
 		// should have it.
@@ -322,6 +422,13 @@ public class BoardManager {
 		return true;
 	}
 
+	/**
+	 * Checks if the given move is valid and safe.
+	 * Calls the isValidMovement() and moveMakesCheck().
+	 * @param initSquare The initial Square
+	 * @param finalSquare The final Square
+	 * @return boolean Whether move is valid
+	 */
 	public boolean isValidMove(Square initSquare, Square finalSquare) {
 
 		if (!isValidMovement(initSquare, finalSquare)) {

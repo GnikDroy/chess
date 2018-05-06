@@ -2,8 +2,9 @@ package game;
 import pieces.*;
 import java.util.*;
 
+
 /**
- * @author Gnik
+ * @author gnik
  *
  */
 public class Board {
@@ -15,6 +16,7 @@ public class Board {
 	/**
 	 * This initialized the board to it's original position.
 	 */
+
 	public Board()
 	{
 		setSquares();
@@ -45,6 +47,7 @@ public class Board {
 		}
 		
 	}
+
 	/**
 	 * Initializes and assigns all white Pieces.
 	 */
@@ -67,6 +70,7 @@ public class Board {
 		squares[7][1].setPiece(new Pawn(PlayerType.WHITE));
 		
 	}
+	
 	/**
 	 * Initializes and sets all Black Pieces.
 	 */
@@ -93,7 +97,7 @@ public class Board {
 	
 	/**
 	 * Returns all the squares on the board. 
-	 * @return Square[][]
+	 * @return Square[][] A dimensional array of all the Squares
 	 */
 	public Square[][] getSquares(){
 		return squares;
@@ -102,8 +106,8 @@ public class Board {
 	
 	/**
 	 * This gets the square with a specific coordinate.
-	 * @param coordinate
-	 * @return
+	 * @param coordinate Coordinate of the square
+	 * @return Square The Square object
 	 */
 	public Square getSquare(Coordinate coordinate){
 		Square result=null;
@@ -121,17 +125,18 @@ public class Board {
 	
 	/**
 	 * Makes a Move from initial Coordinate to final coordinate
-	 * @param initCoordinate
-	 * @param finalCoordinate
+	 * @param initCoordinate The initial Coordinate.
+	 * @param finalCoordinate The final Coordinate.
 	 */
 	public void makeMove(Coordinate initCoordinate,Coordinate finalCoordinate)
 	{
 		makeMove(getSquare(initCoordinate),getSquare(finalCoordinate));
 	}
+	
 	/**
 	 * This makes a move from a square to another. **Move may be invalid**
-	 * @param initSquare
-	 * @param finalSquare
+	 * @param initSquare The initial Square.
+	 * @param finalSquare The final Square
 	 */
 	public void makeMove(Square initSquare,Square finalSquare){
 		//Has a piece been captured;

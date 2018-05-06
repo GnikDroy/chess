@@ -4,6 +4,7 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+
 /**
  * @author gnik
  *
@@ -15,8 +16,8 @@ public abstract class Piece {
 
     /**
      * Initialize a piece with a playerType.
-     * @param player
-     * @param type
+     * @param player The player the piece belongs to 
+     * @param type The piece type
      */
     public Piece(PlayerType player,PieceType type){
         this.type=type;
@@ -38,44 +39,39 @@ public abstract class Piece {
     
     /**
      * Returns if the piece is taken or not.
-     * @return boolean
+     * @return boolean If piece is taken
      */
     public boolean isTaken(){return isTaken;}
     
     
     /**
      * Returns the playerType.
-     * @return PlayerType
+     * @return PlayerType player
      */
     public PlayerType getPlayer(){return player;} 
     
     /**
      * Returns the type of piece.
-     * @return PieceType
+     * @return PieceType Piece
      */
     public PieceType getType(){return type;}
     
     
-    /**
-     * Sets the type of piece. Useful for promotions
-     * @param type
-     */
-    public void setType(PieceType type){this.type=type;}
     
     /**
      * Checks if the move is a valid move by the piece.
-     * @param initPos
-     * @param finalPos
-     * @return
+     * @param initPos Initial Coordinate 
+     * @param finalPos Final Coordinate
+     * @return boolean If the move is Valid
      */
     public abstract boolean isValidMove(Coordinate initPos,Coordinate finalPos);
     
     
     /**
      * Return the path for movement.
-     * @param initPos
-     * @param finalPos
-     * @return
+     * @param initPos The initial Coordinate
+     * @param finalPos The final Coordinate
+     * @return Coordinate[] The Path for the movement 
      */
     public abstract Coordinate[] getPath(Coordinate initPos,Coordinate finalPos);
     

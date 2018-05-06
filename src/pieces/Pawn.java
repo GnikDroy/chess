@@ -5,8 +5,16 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+/**
+ * @author gnik
+ *
+ */
 public class Pawn extends Piece {
-
+	
+    /**
+     * Create a pawn
+     * @param player The player the piece belongs to 
+     */
     public Pawn(PlayerType player){
         super(player,PieceType.PAWN);
     }

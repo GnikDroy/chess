@@ -4,8 +4,16 @@ import game.PieceType;
 import game.PlayerType;
 import game.Coordinate;
 
+/**
+ * @author gnik
+ *
+ */
 public class Bishop extends Piece{
 
+    /**
+     * Create a bishop
+     * @param player The player the bishop belongs to
+     */
     public Bishop(PlayerType player){
         super(player,PieceType.BISHOP);
     }
