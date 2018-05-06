@@ -17,8 +17,8 @@ public class Square {
 	public Coordinate getCoordinate(){return coordinate;}
 	public Piece getPiece(){return piece;}
 	
-	public boolean equals(Square s){
-		if (s.getCoordinate().equals(coordinate)) return true;
+	public boolean equals(Square square){
+		if (square.getCoordinate().equals(coordinate)) return true;
 		return false;
 	}
 	public boolean isOccupied(){

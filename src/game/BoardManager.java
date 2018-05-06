@@ -16,13 +16,35 @@ public class BoardManager {
 		currentPlayer = PlayerType.WHITE;
 	}
 
+	private void switchCurrentPlayer() {
+		if (currentPlayer == PlayerType.WHITE) {
+			currentPlayer = PlayerType.BLACK;
+		} else {
+			currentPlayer = PlayerType.WHITE;
+		}
+
+	}
+
+	public PlayerType getCurrentPlayer() {
+		return currentPlayer;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
 	public boolean promote(Square square, PieceType pieceType) {
 		if (isValidPromotion(square)) {
 			Piece piece;
-			if (pieceType == PieceType.BISHOP) {piece=new Bishop(square.getPiece().getPlayer());}
-			else if (pieceType == PieceType.KNIGHT) {piece=new Knight(square.getPiece().getPlayer()); }
-			else if (pieceType == PieceType.ROOK) {piece=new Rook(square.getPiece().getPlayer());}
-			else {piece=new Queen(square.getPiece().getPlayer());}
+			if (pieceType == PieceType.BISHOP) {
+				piece = new Bishop(square.getPiece().getPlayer());
+			} else if (pieceType == PieceType.KNIGHT) {
+				piece = new Knight(square.getPiece().getPlayer());
+			} else if (pieceType == PieceType.ROOK) {
+				piece = new Rook(square.getPiece().getPlayer());
+			} else {
+				piece = new Queen(square.getPiece().getPlayer());
+			}
 			square.setPiece(piece);
 			return true;
 		}
@@ -47,27 +69,12 @@ public class BoardManager {
 		return false;
 	}
 
-	private void switchCurrentPlayer() {
-		if (currentPlayer == PlayerType.WHITE) {
-			currentPlayer = PlayerType.BLACK;
-		} else {
-			currentPlayer = PlayerType.WHITE;
+	public boolean move(Coordinate initCoordinate, Coordinate finalCoordinate) {
+		if (!(initCoordinate.isValid() && finalCoordinate.isValid())) {
+			return false;
 		}
-
-	}
-
-	public PlayerType getCurrentPlayer() {
-		return currentPlayer;
-	}
-
-	public Board getBoard() {
-		return board;
-	}
-
-	public boolean move(Coordinate c1, Coordinate c2) {
-		if (!(c1.isValid()&&c2.isValid())){return false;}
-		Square s1 = board.getSquare(c1);
-		Square s2 = board.getSquare(c2);
+		Square s1 = board.getSquare(initCoordinate);
+		Square s2 = board.getSquare(finalCoordinate);
 
 		// If the player tries to move a empty square.
 		if (!s1.isOccupied()) {
@@ -80,6 +87,9 @@ public class BoardManager {
 				switchCurrentPlayer();
 				castle(s1, s2);
 				return true;
+			} else if (isValidEnpassant(s1, s2)) {
+				enpassant(s1, s2);
+				return true;
 			} else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
 				board.makeMove(s1, s2);
@@ -89,17 +99,28 @@ public class BoardManager {
 		return false;
 	}
 
-	public boolean isPathClear(Coordinate[] path, Coordinate initPos,
-			Coordinate finalPos) {
-		Square[][] squares = board.getSquares();
-		for (Coordinate coordinate : path) {
-			if ((squares[coordinate.getX()][coordinate.getY()].isOccupied())
-					&& (!coordinate.equals(initPos))
-					&& (!coordinate.equals(finalPos))) {
-				return false;
-			}
+	public boolean isValidEnpassant(Square s1, Square s2) {
+		return false;
+	}
+
+	public void enpassant(Square s1, Square s2) {
+
+	}
+
+	public boolean moveMakesCheck(Square initSquare, Square finalSquare) {
+		Piece temporaryPiece = finalSquare.getPiece();
+		finalSquare.setPiece(initSquare.getPiece());
+		initSquare.releasePiece();
+		if (isCheck(finalSquare.getPiece().getPlayer())) {
+			initSquare.setPiece(finalSquare.getPiece());
+			finalSquare.setPiece(temporaryPiece);
+
+			return true;
+		} else {
+			initSquare.setPiece(finalSquare.getPiece());
+			finalSquare.setPiece(temporaryPiece);
 		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -140,14 +161,14 @@ public class BoardManager {
 		return check;
 	}
 
-	private boolean isValidPawnCapture(Square s1, Square s2) {
+	private boolean isValidPawnCapture(Square initSquare, Square finalSquare) {
 		// If the piece is not a pawn OR this is not a capture.
-		if (!s2.isOccupied() || s1.getPiece().getType() != PieceType.PAWN) {
+		if (!finalSquare.isOccupied() || initSquare.getPiece().getType() != PieceType.PAWN) {
 			return false;
 		}
-		Coordinate initPos = s1.getCoordinate();
-		Coordinate finalPos = s2.getCoordinate();
-		PlayerType player = s1.getPiece().getPlayer();
+		Coordinate initPos = initSquare.getCoordinate();
+		Coordinate finalPos = finalSquare.getCoordinate();
+		PlayerType player = initSquare.getPiece().getPlayer();
 
 		// This is for normal pawn capture moves.
 		if (Math.abs(initPos.getY() - finalPos.getY()) == 1
@@ -179,11 +200,11 @@ public class BoardManager {
 		if (isCheck(kingSquare.getPiece().getPlayer())) {
 			return false;
 		}
-		
-		
+
 		// Check if the path is clear
 		if (!isPathClear(
-				rookSquare.getPiece().getPath(rookSquare.getCoordinate(), kingSquare.getCoordinate()),
+				rookSquare.getPiece().getPath(rookSquare.getCoordinate(),
+						kingSquare.getCoordinate()),
 				rookSquare.getCoordinate(), kingSquare.getCoordinate())) {
 			return false;
 		}
@@ -199,21 +220,26 @@ public class BoardManager {
 			// The peices are in correct position for castling.
 
 			if (kingSquare.getCoordinate().equals(new Coordinate(4, col))
-					&& (rookSquare.getCoordinate().equals(new Coordinate(0, col)) || rookSquare
+					&& (rookSquare.getCoordinate().equals(
+							new Coordinate(0, col)) || rookSquare
 							.getCoordinate().equals(new Coordinate(7, col)))) {
 
 				// Check if there is check in any way between the king and rook
 				int offset;
-				if (Math.signum(rookSquare.getCoordinate().getX() - kingSquare.getCoordinate().getX()) == 1) {
+				if (Math.signum(rookSquare.getCoordinate().getX()
+						- kingSquare.getCoordinate().getX()) == 1) {
 					offset = 2;
 				} else {
 					offset = -2;
 				}
-				int kingX=kingSquare.getCoordinate().getX()+offset;
-				for (Coordinate coordinate : rookSquare.getPiece().getPath(
-						kingSquare.getCoordinate(), new Coordinate(kingX,kingSquare.getCoordinate().getY())  )) {
+				int kingX = kingSquare.getCoordinate().getX() + offset;
+				for (Coordinate coordinate : rookSquare.getPiece()
+						.getPath(
+								kingSquare.getCoordinate(),
+								new Coordinate(kingX, kingSquare
+										.getCoordinate().getY()))) {
 					if (kingSquare.equals(board.getSquare(coordinate))) {
-						//This removes a nasty null pointer exception
+						// This removes a nasty null pointer exception
 						continue;
 					}
 					if (moveMakesCheck(kingSquare, board.getSquare(coordinate))) {
@@ -229,97 +255,82 @@ public class BoardManager {
 
 	public void castle(Square kingSquare, Square rookSquare) {
 		int offset;
-		if (Math.signum(rookSquare.getCoordinate().getX() - kingSquare.getCoordinate().getX()) == 1) {
+		if (Math.signum(rookSquare.getCoordinate().getX()
+				- kingSquare.getCoordinate().getX()) == 1) {
 			offset = 2;
 		} else {
 			offset = -2;
 		}
 		int kingX = kingSquare.getCoordinate().getX() + offset;
 		int rookX = kingX - offset / 2;
-		board.makeMove(kingSquare.getCoordinate(), new Coordinate(kingX, kingSquare
-				.getCoordinate().getY()));
-		board.makeMove(rookSquare.getCoordinate(), new Coordinate(rookX, rookSquare
-				.getCoordinate().getY()));
+		board.makeMove(kingSquare.getCoordinate(), new Coordinate(kingX,
+				kingSquare.getCoordinate().getY()));
+		board.makeMove(rookSquare.getCoordinate(), new Coordinate(rookX,
+				rookSquare.getCoordinate().getY()));
 	}
 
-	public boolean isValidMovement(Square s1, Square s2) {
+	public boolean isPathClear(Coordinate[] path, Coordinate initPos,
+			Coordinate finalPos) {
+		Square[][] squares = board.getSquares();
+		for (Coordinate coordinate : path) {
+			if ((squares[coordinate.getX()][coordinate.getY()].isOccupied())
+					&& (!coordinate.equals(initPos))
+					&& (!coordinate.equals(finalPos))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isValidMovement(Square initSquare, Square finalSquare) {
 		// I am not checking if the squares have valid coordinate because, they
 		// should have it.
 		// If the player tries to move a empty square.
-		if (!s1.isOccupied()) {
+		if (!initSquare.isOccupied()) {
 			return false;
 		}
 		// If it is moving to the same square.
 		// This is also checked by every piece but still for safety
-		if (s1.equals(s2)) {
+		if (initSquare.equals(finalSquare)) {
 			return false;
 		}
 		// If the player tries to take his own piece.
-		if (s2.isOccupied()) {
-			if (s1.getPiece().getPlayer() == s2.getPiece().getPlayer())
+		if (finalSquare.isOccupied()) {
+			if (initSquare.getPiece().getPlayer() == finalSquare.getPiece().getPlayer())
 				return false;
 		}
 
 		// Check all movements here. Normal Moves, Pawn Captures, Castling,
 		// EnPassant.
 		// If the piece cannot move to the square. No such movement.
-		if (!s1.getPiece().isValidMove(s1.getCoordinate(), s2.getCoordinate())
-				&& !isValidPawnCapture(s1, s2)) {
+		if (!initSquare.getPiece().isValidMove(initSquare.getCoordinate(), finalSquare.getCoordinate())
+				&& !isValidPawnCapture(initSquare, finalSquare)) {
 			return false;
 		}
 		// Pawns cannot capture forward.
-		if (s1.getPiece().getType() == PieceType.PAWN && s2.isOccupied()
-				&& !isValidPawnCapture(s1, s2)) {
+		if (initSquare.getPiece().getType() == PieceType.PAWN && finalSquare.isOccupied()
+				&& !isValidPawnCapture(initSquare, finalSquare)) {
 			return false;
 		}
 
 		// If piece is blocked by other pieces
-		Coordinate[] path = s1.getPiece().getPath(s1.getCoordinate(),
-				s2.getCoordinate());
-		if (!isPathClear(path, s1.getCoordinate(), s2.getCoordinate())) {
+		Coordinate[] path = initSquare.getPiece().getPath(initSquare.getCoordinate(),
+				finalSquare.getCoordinate());
+		if (!isPathClear(path, initSquare.getCoordinate(), finalSquare.getCoordinate())) {
 			return false;
 		}
 		return true;
 	}
 
-	public boolean moveMakesCheck(Square s1, Square s2) {
-		Piece temporaryPiece = s2.getPiece();
-		s2.setPiece(s1.getPiece());
-		s1.releasePiece();
-		if (isCheck(s2.getPiece().getPlayer())) {
-			s1.setPiece(s2.getPiece());
-			s2.setPiece(temporaryPiece);
+	public boolean isValidMove(Square initSquare, Square finalSquare) {
 
-			return true;
-		} else {
-			s1.setPiece(s2.getPiece());
-			s2.setPiece(temporaryPiece);
-		}
-		return false;
-	}
-
-	public boolean isValidMove(Square s1, Square s2) {
-
-		if (!isValidMovement(s1, s2)) {
+		if (!isValidMovement(initSquare, finalSquare)) {
 			return false;
 		}
-		if (moveMakesCheck(s1, s2)) {
+		if (moveMakesCheck(initSquare, finalSquare)) {
 			return false;
 		}
 		return true;
-	}
-
-	public static void main(String args[]) {
-		BoardManager b = new BoardManager();
-		b.move(new Coordinate(4, 1), new Coordinate(4, 3));
-		b.move(new Coordinate(0, 6), new Coordinate(0, 5));
-		b.move(new Coordinate(5, 0), new Coordinate(3, 2));
-		//b.move(new Coordinate(0, 5), new Coordinate(0, 4));
-		//b.move(new Coordinate(6, 0), new Coordinate(5, 2));
-		b.move(new Coordinate(0, 4), new Coordinate(0, 3));
-		boolean t = b.move(new Coordinate(4, 0), new Coordinate(7, 0));
-
-		b.getBoard().printBoard();
 	}
 
 }

@@ -1,6 +1,7 @@
 package game;
 import pieces.*;
 import java.util.*;
+
 /**
  * @author Gnik
  *
@@ -118,26 +119,31 @@ public class Board {
 		return result;
 	}
 	
-	public void makeMove(Coordinate c1,Coordinate c2)
+	/**
+	 * Makes a Move from initial Coordinate to final coordinate
+	 * @param initCoordinate
+	 * @param finalCoordinate
+	 */
+	public void makeMove(Coordinate initCoordinate,Coordinate finalCoordinate)
 	{
-		makeMove(getSquare(c1),getSquare(c2));
+		makeMove(getSquare(initCoordinate),getSquare(finalCoordinate));
 	}
 	/**
 	 * This makes a move from a square to another. **Move may be invalid**
-	 * @param s1
-	 * @param s2
+	 * @param initSquare
+	 * @param finalSquare
 	 */
-	public void makeMove(Square s1,Square s2){
+	public void makeMove(Square initSquare,Square finalSquare){
 		//Has a piece been captured;
-		if(s2.isOccupied())
+		if(finalSquare.isOccupied())
 		{
-			capturedPieces.add(s2.getPiece());
-			s2.getPiece().take();
-			s2.releasePiece();
+			capturedPieces.add(finalSquare.getPiece());
+			finalSquare.getPiece().take();
+			finalSquare.releasePiece();
 		}
 		//Make the move
-		s2.setPiece(s1.getPiece());
-		s1.releasePiece();
+		finalSquare.setPiece(initSquare.getPiece());
+		initSquare.releasePiece();
 		
 
 	}
