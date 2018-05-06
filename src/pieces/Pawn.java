@@ -1,8 +1,7 @@
 package pieces;
 
 
-import game.PieceType;
-import game.PlayerType;
+import player.PlayerType;
 import game.Coordinate;
 
 /**

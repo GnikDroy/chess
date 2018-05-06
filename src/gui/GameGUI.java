@@ -1,4 +1,8 @@
-package game;
+package gui;
+
+import game.BoardManager;
+import game.Coordinate;
+import game.Square;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -6,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import pieces.PieceType;
+import player.PlayerType;
 
 
 /**

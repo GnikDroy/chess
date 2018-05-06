@@ -1,7 +1,9 @@
 package game;
 
 import pieces.*;
-import game.PlayerType;
+import player.PlayerType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gnik
@@ -19,8 +21,10 @@ public class BoardManager {
 	 */
 	private PlayerType currentPlayer = PlayerType.WHITE;
 
-	
-	
+	/**
+	 * This is the list that holds all the moves made by the user.
+	 */
+	private List<Move> moveList=new ArrayList<Move>();
 	
 	/**
 	 * Constructs a new BoardManager object
@@ -58,6 +62,14 @@ public class BoardManager {
 	}
 
 	/**
+	 * Returns a list of moves that the player has made.
+	 * @return List The list of moves
+	 */
+	public List<Move> getMoveList(){
+		return moveList;
+	}
+	
+	/**
 	 * Returns the board object
 	 * @return board The board object
 	 */
@@ -75,6 +87,7 @@ public class BoardManager {
 	public boolean promote(Square square, PieceType pieceType) {
 		if (isValidPromotion(square)) {
 			Piece piece;
+			moveList.add(new Move(square.getCoordinate(),square.getCoordinate(),pieceType));
 			if (pieceType == PieceType.BISHOP) {
 				piece = new Bishop(square.getPiece().getPlayer());
 			} else if (pieceType == PieceType.KNIGHT) {
@@ -136,13 +149,16 @@ public class BoardManager {
 		if (currentPlayer == s1.getPiece().getPlayer()) {
 			if (isValidCastling(s1, s2)) {
 				switchCurrentPlayer();
+				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
 				castle(s1, s2);
 				return true;
 			} else if (isValidEnpassant(s1, s2)) {
+				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
 				enpassant(s1, s2);
 				return true;
 			} else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
+				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
 				board.makeMove(s1, s2);
 				return true;
 			}

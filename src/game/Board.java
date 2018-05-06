@@ -1,5 +1,7 @@
 package game;
 import pieces.*;
+import player.PlayerType;
+
 import java.util.*;
 
 

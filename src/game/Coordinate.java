@@ -2,7 +2,7 @@ package game;
 
 /**
  * @author gnik
- *
+ * 
  */
 public class Coordinate {
 	int positionX;
@@ -10,8 +10,11 @@ public class Coordinate {
 
 	/**
 	 * Initializes a new coordinate with the x and y values.
-	 * @param x The x coordinate
-	 * @param y The y coordinate
+	 * 
+	 * @param x
+	 *            The x coordinate
+	 * @param y
+	 *            The y coordinate
 	 */
 	public Coordinate(int x, int y) {
 		positionX = x;
@@ -21,10 +24,12 @@ public class Coordinate {
 
 	/**
 	 * Checks if a Coordinate is valid or not
+	 * 
 	 * @return boolean If coordinate is valid
 	 */
 	public boolean isValid() {
-		if ((positionX >= 0 && positionX < 8) && (positionY >= 0 && positionY < 8)) {
+		if ((positionX >= 0 && positionX < 8)
+				&& (positionY >= 0 && positionY < 8)) {
 			return true;
 		}
 		return false;
@@ -32,6 +37,7 @@ public class Coordinate {
 
 	/**
 	 * Gets the x coordinate
+	 * 
 	 * @return int The x coordinate
 	 */
 	public int getX() {
@@ -40,6 +46,7 @@ public class Coordinate {
 
 	/**
 	 * Gets the y coordinate
+	 * 
 	 * @return int The y coordinate.
 	 */
 	public int getY() {
@@ -48,7 +55,9 @@ public class Coordinate {
 
 	/**
 	 * Sets the x coordinate
-	 * @param x The x coordinate
+	 * 
+	 * @param x
+	 *            The x coordinate
 	 */
 	public void setX(int x) {
 		positionX = x;
@@ -56,13 +65,17 @@ public class Coordinate {
 
 	/**
 	 * Sets the y coordinate
-	 * @param y The y coordinate
+	 * 
+	 * @param y
+	 *            The y coordinate
 	 */
 	public void setY(int y) {
 		positionY = y;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -70,14 +83,29 @@ public class Coordinate {
 	}
 
 	/**
-	 * Checks if two coordinates are equal. The x and y coordinates should be equal.
-	 * @param coordinate A coordinate
+	 * Checks if two coordinates are equal. The x and y coordinates should be
+	 * equal.
+	 * 
+	 * @param coordinate
+	 *            A coordinate
 	 * @return boolean If the coordinates have equal value
 	 */
 	public boolean equals(Coordinate coordinate) {
-		if ((positionX == coordinate.getX()) && (positionY == coordinate.getY())) {
+		if ((positionX == coordinate.getX())
+				&& (positionY == coordinate.getY())) {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * This converts the coordinate to UCI chess notation
+	 * @return String The string representation of the square in UCI form
+	 */
+	public String getParsedCoordinate() {
+		String parsedString = "";
+		parsedString = (char) (positionX + 97)
+				+ Integer.toString(positionY + 1);
+		return parsedString;
 	}
 }
