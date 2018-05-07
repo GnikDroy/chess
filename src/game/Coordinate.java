@@ -23,6 +23,15 @@ public class Coordinate {
 	}
 
 	/**
+	 * Creates a coordinate from a UCI move string
+	 * @param coordinate The coordinate in string format (UCI)
+	 */
+	public Coordinate(String coordinate){
+		positionX=(char)coordinate.toCharArray()[0]-97;
+		positionY=Integer.parseInt(coordinate.substring(1,2))-1;
+		
+	}
+	/**
 	 * Checks if a Coordinate is valid or not
 	 * 
 	 * @return boolean If coordinate is valid

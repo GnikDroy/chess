@@ -16,7 +16,7 @@ public class MoveParser {
 	public static String parse(List<Move> moveList){
 		String parsedMoves="";
 		for(Move move:moveList){
-			parsedMoves+=parseMove(move);
+			parsedMoves+=parseMove(move)+" ";
 		}
 		return parsedMoves;
 	}

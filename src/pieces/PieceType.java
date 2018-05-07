@@ -5,7 +5,7 @@ package pieces;
  *
  */
 public enum PieceType {
-	KING("K"), KNIGHT("N"), ROOK("R"), QUEEN("Q"), BISHOP("B"), PAWN("P");
+	KING("k"), KNIGHT("n"), ROOK("r"), QUEEN("q"), BISHOP("b"), PAWN("p");
 
 	private String value;
 
@@ -18,4 +18,13 @@ public enum PieceType {
 	public String toString() {
 		return this.value;
 	}
+	public static PieceType fromString(String value){
+	    for (PieceType piece :PieceType.values()) {
+	        if (piece.value.equalsIgnoreCase(value)) {
+	          return piece;
+	        }
+	      }
+	      return null;
+	}
+
 }
