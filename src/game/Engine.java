@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import pieces.PieceType;
 
 /**
  * @author gnik
@@ -14,7 +13,7 @@ import pieces.PieceType;
  */
 public class Engine {
 	/**
-	 * This is the stockfish process that runs in the background.
+	 * This is the Stockfish process that runs in the background.
 	 */
 	private Process stockfish;
 	
@@ -29,7 +28,8 @@ public class Engine {
 	private BufferedReader stockfishOutput;
 
 	/**
-	 * This starts a new process (if it can) engine.
+	 * This starts a new process for the stockfish engine(if available only.
+	 * Also sets it in UCI_Chess960 mode with default options. Else it prints a stacktrace.
 	 */
 	public Engine() {
 		try {
@@ -46,17 +46,17 @@ public class Engine {
 			stockfishInput.flush();
 			stockfishOutput.readLine();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * This returns the best possible move 
+	 * If there is no possible move(Checkmate) then it send a blank string.(BUGGY)
 	 * @param position The current board position in UCI format
 	 * @return String The best possible move in UCI format
 	 */
 	public String getBestMove(String position) {
-		System.out.println(position);
 		String output = "Stockfish api";
 		try {
 			stockfishInput.write("position startpos moves " + position + "\n");
@@ -66,6 +66,7 @@ public class Engine {
 				output = stockfishOutput.readLine();
 			}
 			stockfishInput.write("stop" + "\n");
+			if (output.equals("bestmove (none)")){return "";}
 			output = output.split(" ")[1];
 
 		} catch (IOException e) {
@@ -74,6 +75,11 @@ public class Engine {
 
 		return output;
 	}
+	
+	
+	/**
+	 * Closes the to the Stockfish engine process gracefully. 
+	 */
 	public void quit(){
 		try {
 			stockfishInput.write("quit\n");
@@ -82,8 +88,5 @@ public class Engine {
 		}
 		stockfish.destroy();
 	}
-	public static void main(String args[])
-	{
-		System.out.println(PieceType.valueOf("q"));
-	}
+
 }

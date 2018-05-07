@@ -61,17 +61,13 @@ public class GameGUIEngine {
 	}
 
 	class MyActionListener implements ActionListener {
-
-		public void updateBoard() {
-			//This if command is the AI move
+		public void moveAI(){
 			if (boardManager.getCurrentPlayer()==PlayerType.BLACK){
-				boolean moved=false;
-				while(moved==false)
-				{
 				String bestMove=stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList()));
+				if(!bestMove.equals("(none)")){
 				Coordinate initCoordinate=new Coordinate(bestMove.substring(0,2));
 				Coordinate finalCoordinate=new Coordinate(bestMove.substring(2,4));
-				moved = boardManager.move(initCoordinate,finalCoordinate);
+				boardManager.move(initCoordinate,finalCoordinate);
 				if (boardManager.isValidPromotion(boardManager.getBoard()
 						.getSquare(finalCoordinate))) {
 					boardManager.promote(
@@ -80,6 +76,10 @@ public class GameGUIEngine {
 				}
 				
 			}
+		}
+		public void updateBoard() {
+			moveAI();
+			
 			Square[][] squares = boardManager.getBoard().getSquares();
 			for (int row = 0; row < 8; row++) {
 				for (int col = 0; col < 8; col++) {
@@ -153,6 +153,10 @@ public class GameGUIEngine {
 			}
 			Coordinate currentCoordinate = new Coordinate(selectionX,
 					selectionY);
+			if(stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList())).equals("")){
+				boardManager.resetBoard();
+			}
+
 			
 			boolean moved = false;
 			if (lastSelection != null) {
@@ -175,8 +179,10 @@ public class GameGUIEngine {
 					lastSelection = null;
 					updateBoard();
 				}
+				
+				
 			}
-
+			
 			if (!moved) {
 				lastSelection = button;
 			}
