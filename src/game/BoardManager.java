@@ -211,7 +211,40 @@ public class BoardManager {
 		return checkmate;
 
 	}
-
+	
+	
+	/**
+	 * This function returns all the valid moves a square/piece can make
+	 * @param coordinate The coordinate of the piece/square.
+	 * @return Square[] The array of possible squares.
+	 */
+	public Square[] getValidMoves(Coordinate coordinate){
+		
+		Square[] moves;
+		//How many valid moves are there?
+		int validMoves=0;
+		for (int x=0;x<8;x++){
+			for (int y=0;y<8;y++){
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
+				{
+					validMoves+=1;
+				}
+			}
+		}
+		moves=new Square[validMoves];
+		//Get all valid moves.
+		validMoves=0;
+		for (int x=0;x<8;x++){
+			for (int y=0;y<8;y++){
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
+				{
+					moves[validMoves]=board.getSquares()[x][y];
+					validMoves++;
+				}
+			}
+		}
+		return moves;
+	}
 	/**
 	 * Returns the array of squares of the pieces that are attacking the King If
 	 * no piece is attacking it then {null,null} is returned.
