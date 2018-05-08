@@ -27,11 +27,16 @@ public class Engine {
 	 */
 	private BufferedReader stockfishOutput;
 
+	
+	private int stockfishLevel;
+
 	/**
-	 * This starts a new process for the stockfish engine(if available only.
+	 * This starts a new process for the stockfish engine(if available only).
 	 * Also sets it in UCI_Chess960 mode with default options. Else it prints a stacktrace.
+	 * @param level The difficulty level from 0-20.
 	 */
-	public Engine() {
+	public Engine(int level) {
+		stockfishLevel=level;
 		try {
 			stockfish = Runtime.getRuntime().exec("stockfish");
 		} catch (IOException e) {
@@ -43,6 +48,7 @@ public class Engine {
 				stockfish.getInputStream()));
 		try {
 			stockfishInput.write("setoption name UCI_Chess960 value true\n");
+			stockfishInput.write("setoption name Skill Level value "+Integer.toString(stockfishLevel)+"\n");
 			stockfishInput.flush();
 			stockfishOutput.readLine();
 		} catch (Exception e) {
@@ -50,6 +56,13 @@ public class Engine {
 		}
 	}
 
+	/**
+	 * Starts a new engine at max difficulty. Same as Engine(20)
+	 */
+	public Engine()
+	{
+		this(20);
+	}
 	/**
 	 * This returns the best possible move 
 	 * If there is no possible move(Checkmate) then it send a blank string.(BUGGY)

@@ -1,13 +1,6 @@
--------Bugs------------------
-The move class doesnot take promotions nicely.
-The gui class also doesnot take promotions nicely.
-Completely change the gui class.(It is really ugly)
-
 -------Feature---------------
 Add Enpassant
-Add 50 Step draw and three-fold repetition
-Flip Board while player is switched.
-View Games
-Save/Load Game
-Add game analysis
-Add networking facilities.
+Start new game after the previous has ended(A menu could work)
+Select piece for promotion.
+A function that checks for chekmate
+

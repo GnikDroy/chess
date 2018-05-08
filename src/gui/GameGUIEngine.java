@@ -24,19 +24,36 @@ public class GameGUIEngine {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
 	private JButton[][] allButtons = null;
-	private Engine stockfish=new Engine();
-	
+	private Engine stockfish=new Engine(0);
+	private PlayerType humanPlayer=PlayerType.WHITE;
 
 	public static void main(String[] args) {
-		new GameGUIEngine();
+		new GameGUIEngine(PlayerType.WHITE);
 	}
 
-	public GameGUIEngine() {
+	public GameGUIEngine(PlayerType player) {
+		humanPlayer=player;
 		boardManager = new BoardManager();
 		initialize();
 
 	}
-	
+	public void moveAI(){
+		if (boardManager.getCurrentPlayer()!=humanPlayer){
+			String bestMove=stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList()));
+			
+			if(!bestMove.equals("")){
+			System.out.println("The best move is "+bestMove);
+			Coordinate initCoordinate=new Coordinate(bestMove.substring(0,2));
+			Coordinate finalCoordinate=new Coordinate(bestMove.substring(2,4));
+			boardManager.move(initCoordinate,finalCoordinate);
+			if (boardManager.isValidPromotion(boardManager.getBoard()
+					.getSquare(finalCoordinate))) {
+				boardManager.promote(
+						boardManager.getBoard().getSquare(
+								finalCoordinate), PieceType.fromString(bestMove.substring(4,5)));}
+			}
+		}
+	}	
 	private void initialize() {
 		JFrame guiFrame = new JFrame();
 		guiFrame.setMinimumSize(new Dimension(700, 700));
@@ -53,97 +70,82 @@ public class GameGUIEngine {
 				.getSquares());
 
 		allButtons = window.getButtons();
+		updateBoard();
 		guiFrame.add(window);
 		guiFrame.pack();
 		window.setVisible(true);
 		guiFrame.setVisible(true);
 
 	}
+	public void updateBoard() {
+		moveAI();
+		
+		Square[][] squares = boardManager.getBoard().getSquares();
+		for (int row = 0; row < 8; row++) {
+			for (int col = 0; col < 8; col++) {
+				JButton button;
+				Square square;
+				if (boardManager.getCurrentPlayer() == PlayerType.BLACK) {
+					button = allButtons[col][row];
+					square = squares[row][col];
+				} else {
+					button = allButtons[col][row];
+					square = squares[row][7 - col];
+				}
 
+				// This is necessary to set the background of the buttons.
+				int offset = 1;
+				if (boardManager.getCurrentPlayer() == PlayerType.WHITE) {
+					offset = 0;
+				}
+				if ((row + col + offset) % 2 == 0) {
+					button.setBackground(java.awt.Color.white);
+				} else {
+					button.setBackground(new Color(29, 114, 46));
+				}
+				// Places peices if there the square are occupied.
+				if (square.isOccupied()) {
+					String playerString;
+					String pieceString;
+					if (square.getPiece().getPlayer() == PlayerType.WHITE) {
+						playerString = "white";
+					} else {
+						playerString = "black";
+					}
+					if (square.getPiece().getType() == PieceType.KING) {
+						pieceString = "King";
+					} else if (square.getPiece().getType() == PieceType.PAWN) {
+						pieceString = "Pawn";
+					} else if (square.getPiece().getType() == PieceType.ROOK) {
+						pieceString = "Rook";
+					} else if (square.getPiece().getType() == PieceType.KNIGHT) {
+						pieceString = "Knight";
+					} else if (square.getPiece().getType() == PieceType.BISHOP) {
+						pieceString = "Bishop";
+					} else {
+						pieceString = "Queen";
+					}
+
+					Image image = null;
+					try {
+						image = ImageIO.read(getClass().getResource(
+								"/" + playerString + pieceString + ".png"));
+					} catch (IOException e) {
+					}
+					button.setIcon(new ImageIcon(image));
+
+				} else {
+					button.setIcon(null);
+				}
+			}
+		}}
 	class MyActionListener implements ActionListener {
-		public void moveAI(){
-			if (boardManager.getCurrentPlayer()==PlayerType.BLACK){
-				String bestMove=stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList()));
-				if(!bestMove.equals("(none)")){
-				Coordinate initCoordinate=new Coordinate(bestMove.substring(0,2));
-				Coordinate finalCoordinate=new Coordinate(bestMove.substring(2,4));
-				boardManager.move(initCoordinate,finalCoordinate);
-				if (boardManager.isValidPromotion(boardManager.getBoard()
-						.getSquare(finalCoordinate))) {
-					boardManager.promote(
-							boardManager.getBoard().getSquare(
-									finalCoordinate), PieceType.fromString(bestMove.substring(4,5)));}
-				}
-				
-			}
-		}
-		public void updateBoard() {
-			moveAI();
-			
-			Square[][] squares = boardManager.getBoard().getSquares();
-			for (int row = 0; row < 8; row++) {
-				for (int col = 0; col < 8; col++) {
-					JButton button;
-					Square square;
-					if (boardManager.getCurrentPlayer() == PlayerType.BLACK) {
-						button = allButtons[col][row];
-						square = squares[row][col];
-					} else {
-						button = allButtons[col][row];
-						square = squares[row][7 - col];
-					}
 
-					// This is necessary to set the background of the buttons.
-					int offset = 1;
-					if (boardManager.getCurrentPlayer() == PlayerType.WHITE) {
-						offset = 0;
-					}
-					if ((row + col + offset) % 2 == 0) {
-						button.setBackground(java.awt.Color.white);
-					} else {
-						button.setBackground(new Color(29, 114, 46));
-					}
-					// Places peices if there the square are occupied.
-					if (square.isOccupied()) {
-						String playerString;
-						String pieceString;
-						if (square.getPiece().getPlayer() == PlayerType.WHITE) {
-							playerString = "white";
-						} else {
-							playerString = "black";
-						}
-						if (square.getPiece().getType() == PieceType.KING) {
-							pieceString = "King";
-						} else if (square.getPiece().getType() == PieceType.PAWN) {
-							pieceString = "Pawn";
-						} else if (square.getPiece().getType() == PieceType.ROOK) {
-							pieceString = "Rook";
-						} else if (square.getPiece().getType() == PieceType.KNIGHT) {
-							pieceString = "Knight";
-						} else if (square.getPiece().getType() == PieceType.BISHOP) {
-							pieceString = "Bishop";
-						} else {
-							pieceString = "Queen";
-						}
 
-						Image image = null;
-						try {
-							image = ImageIO.read(getClass().getResource(
-									"/" + playerString + pieceString + ".png"));
-						} catch (IOException e) {
-						}
-						button.setIcon(new ImageIcon(image));
 
-					} else {
-						button.setIcon(null);
-					}
-				}
-			}
-
-		}
+		
 
 		public void actionPerformed(ActionEvent e) {
-
 			JButton button = (JButton) e.getSource();
 			Point rv = new Point();
 			int selectionX = button.getLocation(rv).x / 80;
@@ -153,10 +155,6 @@ public class GameGUIEngine {
 			}
 			Coordinate currentCoordinate = new Coordinate(selectionX,
 					selectionY);
-			if(stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList())).equals("")){
-				boardManager.resetBoard();
-			}
-
 			
 			boolean moved = false;
 			if (lastSelection != null) {
@@ -168,7 +166,7 @@ public class GameGUIEngine {
 				Coordinate lastCoordinate = new Coordinate(selectionX,
 						selectionY);
 				moved = boardManager.move(lastCoordinate, currentCoordinate);
-
+				
 				if (moved) {
 					if (boardManager.isValidPromotion(boardManager.getBoard()
 							.getSquare(currentCoordinate))) {

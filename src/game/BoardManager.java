@@ -298,6 +298,9 @@ public class BoardManager {
 			return false;
 		}
 
+
+		//First check if the move is valid.
+		if(!rookSquare.getPiece().isValidMove(kingSquare.getCoordinate(),rookSquare.getCoordinate())){return false;}
 		// Check if the path is clear
 		if (!isPathClear(
 				rookSquare.getPiece().getPath(rookSquare.getCoordinate(),

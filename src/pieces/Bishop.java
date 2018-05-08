@@ -44,8 +44,6 @@ public class Bishop extends Piece{
 			path[cnt]=new Coordinate(initPos.getX()+i_X*cnt,initPos.getY()+i_Y*cnt);
 		}
 
-
-		for (Coordinate c:path) {System.out.println(c);}
 		
 		return path;
 	}
