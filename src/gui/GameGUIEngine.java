@@ -24,7 +24,7 @@ public class GameGUIEngine {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
 	private JButton[][] allButtons = null;
-	private Engine stockfish=new Engine(0);
+	private Engine stockfish=new Engine(20);
 	private PlayerType humanPlayer=PlayerType.WHITE;
 
 	public static void main(String[] args) {
@@ -42,7 +42,6 @@ public class GameGUIEngine {
 			String bestMove=stockfish.getBestMove(MoveParser.parse(boardManager.getMoveList()));
 			
 			if(!bestMove.equals("")){
-			System.out.println("The best move is "+bestMove);
 			Coordinate initCoordinate=new Coordinate(bestMove.substring(0,2));
 			Coordinate finalCoordinate=new Coordinate(bestMove.substring(2,4));
 			boardManager.move(initCoordinate,finalCoordinate);
@@ -78,8 +77,11 @@ public class GameGUIEngine {
 
 	}
 	public void updateBoard() {
+		if(boardManager.isGameOver()){
+			boardManager.resetBoard();
+		}		
 		moveAI();
-		
+
 		Square[][] squares = boardManager.getBoard().getSquares();
 		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < 8; col++) {
@@ -166,7 +168,7 @@ public class GameGUIEngine {
 				Coordinate lastCoordinate = new Coordinate(selectionX,
 						selectionY);
 				moved = boardManager.move(lastCoordinate, currentCoordinate);
-				
+				if (boardManager.isGameOver()){boardManager.resetBoard();updateBoard();return;}
 				if (moved) {
 					if (boardManager.isValidPromotion(boardManager.getBoard()
 							.getSquare(currentCoordinate))) {

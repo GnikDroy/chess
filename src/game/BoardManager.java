@@ -7,25 +7,24 @@ import java.util.List;
 
 /**
  * @author gnik
- *
+ * 
  */
 public class BoardManager {
 	/**
 	 * The board object
 	 */
 	private Board board;
-	
+
 	/**
-	 * Current Player which is to move.
-	 * Default is PlayerType.WHITE
+	 * Current Player which is to move. Default is PlayerType.WHITE
 	 */
 	private PlayerType currentPlayer = PlayerType.WHITE;
 
 	/**
 	 * This is the list that holds all the moves made by the user.
 	 */
-	private List<Move> moveList=new ArrayList<Move>();
-	
+	private List<Move> moveList = new ArrayList<Move>();
+
 	/**
 	 * Constructs a new BoardManager object
 	 */
@@ -37,6 +36,7 @@ public class BoardManager {
 	 * Resets the board to it's initial state
 	 */
 	public void resetBoard() {
+		moveList=new ArrayList<Move>();
 		board.resetBoard();
 		currentPlayer = PlayerType.WHITE;
 	}
@@ -55,6 +55,7 @@ public class BoardManager {
 
 	/**
 	 * Return the player who is to move
+	 * 
 	 * @return PlayerType The player
 	 */
 	public PlayerType getCurrentPlayer() {
@@ -63,14 +64,16 @@ public class BoardManager {
 
 	/**
 	 * Returns a list of moves that the player has made.
+	 * 
 	 * @return List The list of moves
 	 */
-	public List<Move> getMoveList(){
+	public List<Move> getMoveList() {
 		return moveList;
 	}
-	
+
 	/**
 	 * Returns the board object
+	 * 
 	 * @return board The board object
 	 */
 	public Board getBoard() {
@@ -78,16 +81,20 @@ public class BoardManager {
 	}
 
 	/**
-	 * Promotes a pawn to a newer piece.
-	 * Calls isValidPromotion function first
-	 * @param square Promotion Square
-	 * @param pieceType The type of piece to promote to. If none is provided it defaults to Queen.
+	 * Promotes a pawn to a newer piece. Calls isValidPromotion function first
+	 * 
+	 * @param square
+	 *            Promotion Square
+	 * @param pieceType
+	 *            The type of piece to promote to. If none is provided it
+	 *            defaults to Queen.
 	 * @return boolean If the promotion was made
 	 */
 	public boolean promote(Square square, PieceType pieceType) {
 		if (isValidPromotion(square)) {
 			Piece piece;
-			moveList.add(new Move(square.getCoordinate(),square.getCoordinate(),pieceType));
+			moveList.add(new Move(square.getCoordinate(), square
+					.getCoordinate(), pieceType));
 			if (pieceType == PieceType.BISHOP) {
 				piece = new Bishop(square.getPiece().getPlayer());
 			} else if (pieceType == PieceType.KNIGHT) {
@@ -105,7 +112,9 @@ public class BoardManager {
 
 	/**
 	 * Checks if the square contains a pawn that can be promoted.
-	 * @param square Square of the pawn
+	 * 
+	 * @param square
+	 *            Square of the pawn
 	 * @return boolean If the pawn can be promoted
 	 */
 	public boolean isValidPromotion(Square square) {
@@ -127,10 +136,120 @@ public class BoardManager {
 	}
 
 	/**
-	 * Makes a move from initial coordinate to final one.
-	 * It calls isValidMove(),isValidCastling() and isValidEnpassant()
-	 * @param initCoordinate Initial Coordinate
-	 * @param finalCoordinate Final Coordinate
+	 * Returns if either of the players are checkmated.
+	 * 
+	 * @return boolean
+	 */
+	public boolean isGameOver() {
+		if (isCheckmate(PlayerType.WHITE) || isCheckmate(PlayerType.BLACK)) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns if the player is checkmated or not.
+	 * 
+	 * @param player
+	 *            The player to check checkmate for
+	 * @return boolean
+	 */
+	public boolean isCheckmate(PlayerType player) {
+		Square[] attackers = getAttackingPieces(player);
+		// If there are no attackers
+		if (attackers[0] == null && attackers[1] == null) {
+			return false;
+		}
+		// If there are two attackers then the king must move.
+		if (attackers[0] != null && attackers[1] != null) {
+			for (int x = 0; x < 8; x++) {
+				for (int y = 0; y < 8; y++) {
+					Square square=board.getSquares()[x][y];
+					if (isValidMove(squareOfKing(player), square)
+							&& squareOfKing(player) != square) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		// If there is only one attacker then there are many options check all.
+		boolean checkmate = true;
+		Square attackerSquare = attackers[0];
+		Square kingSquare = squareOfKing(player);
+		Coordinate[] attackPath = attackerSquare.getPiece().getPath(
+				attackerSquare.getCoordinate(), kingSquare.getCoordinate());
+		Square[][] allSquares = board.getSquares();
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+
+				//If the king can move to a different square.
+				if (isValidMove(squareOfKing(player), board.getSquares()[x][y])
+						&& squareOfKing(player) != board.getSquares()[x][y]) {
+					return false;
+				}
+				for (Coordinate coordinate : attackPath) {
+					Square tmpSquare = allSquares[x][y];
+					// The square must be occupied
+					if (tmpSquare.isOccupied()) {
+						
+						// The player must move his own piece between the paths
+						// of the attacker and the King.
+						// If it can do so then there is no checkmate
+						if (tmpSquare.getPiece().getPlayer() == kingSquare
+								.getPiece().getPlayer()
+								&& isValidMove(tmpSquare,
+										board.getSquare(coordinate))) {
+							checkmate = false;
+						}
+					}
+
+				}
+			}
+
+		}
+		return checkmate;
+
+	}
+
+	/**
+	 * Returns the array of squares of the pieces that are attacking the King If
+	 * no piece is attacking it then {null,null} is returned.
+	 * 
+	 * @param player The player whose king is under attack
+	 * @return Squares[] The array of squares of pieces that are attacking the
+	 *         King. Max Size of array is 2
+	 */
+	public Square[] getAttackingPieces(PlayerType player) {
+		Square[] squares = new Square[] { null, null };
+		Square[][] allSquares = board.getSquares();
+		Square kingSquare = squareOfKing(player);
+		int count = 0;
+		for (int x = 0; x < 8; x++) {
+			for (int y = 0; y < 8; y++) {
+				Square tmpSquare = allSquares[x][y];
+				if (tmpSquare.isOccupied()) {
+					if (isValidMovement(tmpSquare, kingSquare)
+							&& kingSquare.getPiece().getPlayer() != tmpSquare
+									.getPiece().getPlayer()) {
+						squares[count] = tmpSquare;
+						count++;
+					}
+				}
+
+			}
+		}
+		return squares;
+	}
+
+	/**
+	 * Makes a move from initial coordinate to final one. It calls
+	 * isValidMove(),isValidCastling() and isValidEnpassant()
+	 * 
+	 * @param initCoordinate
+	 *            Initial Coordinate
+	 * @param finalCoordinate
+	 *            Final Coordinate
 	 * @return boolean If the move was made
 	 */
 	public boolean move(Coordinate initCoordinate, Coordinate finalCoordinate) {
@@ -149,16 +268,19 @@ public class BoardManager {
 		if (currentPlayer == s1.getPiece().getPlayer()) {
 			if (isValidCastling(s1, s2)) {
 				switchCurrentPlayer();
-				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
+				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
+						s1.getPiece().getType()));
 				castle(s1, s2);
 				return true;
 			} else if (isValidEnpassant(s1, s2)) {
-				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
+				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
+						s1.getPiece().getType()));
 				enpassant(s1, s2);
 				return true;
 			} else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
-				moveList.add(new Move(s1.getCoordinate(),s2.getCoordinate(),s1.getPiece().getType()));
+				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
+						s1.getPiece().getType()));
 				board.makeMove(s1, s2);
 				return true;
 			}
@@ -168,19 +290,24 @@ public class BoardManager {
 
 	/**
 	 * Checks if the move is valid enpassant move.
-	 * @param s1 Initial Square
-	 * @param s2 Final Square
+	 * 
+	 * @param s1
+	 *            Initial Square
+	 * @param s2
+	 *            Final Square
 	 * @return boolean If enpassant valid
 	 */
 	public boolean isValidEnpassant(Square s1, Square s2) {
 		return false;
 	}
 
-	
 	/**
 	 * Makes a Enpassant move
-	 * @param initSquare Initial Square
-	 * @param finalSquare Final Square
+	 * 
+	 * @param initSquare
+	 *            Initial Square
+	 * @param finalSquare
+	 *            Final Square
 	 */
 	public void enpassant(Square initSquare, Square finalSquare) {
 
@@ -188,8 +315,11 @@ public class BoardManager {
 
 	/**
 	 * Checks if the given move makes check for the moving player
-	 * @param initSquare Initial Square
-	 * @param finalSquare Final Square
+	 * 
+	 * @param initSquare
+	 *            Initial Square
+	 * @param finalSquare
+	 *            Final Square
 	 * @return boolean If the move makes check.
 	 */
 	public boolean moveMakesCheck(Square initSquare, Square finalSquare) {
@@ -209,14 +339,14 @@ public class BoardManager {
 	}
 
 	/**
-	 * Checks if there is check for the player
+	 * Gets the square of the King
 	 * 
-	 * @param player Is this player in check
-	 * @return boolean If the player is in check
+	 * @param player
+	 *            The player whose king it is
+	 * @return Square The square of the king
 	 */
-	public boolean isCheck(PlayerType player) {
+	public Square squareOfKing(PlayerType player) {
 		Square[][] squares = board.getSquares();
-		// Gets the square of the king.
 		Square squareOfKing = null;
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -229,32 +359,48 @@ public class BoardManager {
 				}
 			}
 		}
-		// Checks if there is check
-		boolean check = false;
+		return squareOfKing;
+	}
+
+	/**
+	 * Checks if there is check for the player
+	 * 
+	 * @param player
+	 *            Is this player in check
+	 * @return boolean If the player is in check
+	 */
+	public boolean isCheck(PlayerType player) {
+		Square[][] allSquares = board.getSquares();
+		Square kingSquare = squareOfKing(player);
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
-				Square square = squares[x][y];
-				if (square.isOccupied()) {
-					if (square.getPiece().getPlayer() != player) {
-						// This function depends on the isValidMovement function
-						if (isValidMovement(square, squareOfKing))
-							check = true;
+				Square tmpSquare = allSquares[x][y];
+				if (tmpSquare.isOccupied()) {
+					if (isValidMovement(tmpSquare, kingSquare)
+							&& kingSquare.getPiece().getPlayer() != tmpSquare
+									.getPiece().getPlayer()) {
+						return true;
 					}
 				}
+
 			}
 		}
-		return check;
+		return false;
 	}
 
 	/**
 	 * Checks if the move is valid pawn capture move
-	 * @param initSquare Initial Square
-	 * @param finalSquare Final Square
+	 * 
+	 * @param initSquare
+	 *            Initial Square
+	 * @param finalSquare
+	 *            Final Square
 	 * @return boolean If the pawn capture is valid
 	 */
 	private boolean isValidPawnCapture(Square initSquare, Square finalSquare) {
 		// If the piece is not a pawn OR this is not a capture.
-		if (!finalSquare.isOccupied() || initSquare.getPiece().getType() != PieceType.PAWN) {
+		if (!finalSquare.isOccupied()
+				|| initSquare.getPiece().getType() != PieceType.PAWN) {
 			return false;
 		}
 		Coordinate initPos = initSquare.getCoordinate();
@@ -283,8 +429,11 @@ public class BoardManager {
 
 	/**
 	 * Checks if it is valid Castling move
-	 * @param kingSquare The square of the king
-	 * @param rookSquare The square of the rook
+	 * 
+	 * @param kingSquare
+	 *            The square of the king
+	 * @param rookSquare
+	 *            The square of the rook
 	 * @return boolean If this is valid Castling
 	 */
 	public boolean isValidCastling(Square kingSquare, Square rookSquare) {
@@ -298,9 +447,11 @@ public class BoardManager {
 			return false;
 		}
 
-
-		//First check if the move is valid.
-		if(!rookSquare.getPiece().isValidMove(kingSquare.getCoordinate(),rookSquare.getCoordinate())){return false;}
+		// First check if the move is valid.
+		if (!rookSquare.getPiece().isValidMove(kingSquare.getCoordinate(),
+				rookSquare.getCoordinate())) {
+			return false;
+		}
 		// Check if the path is clear
 		if (!isPathClear(
 				rookSquare.getPiece().getPath(rookSquare.getCoordinate(),
@@ -354,10 +505,14 @@ public class BoardManager {
 	}
 
 	/**
-	 * Makes a castle move.<p>
+	 * Makes a castle move.
+	 * <p>
 	 * It calls the isValidCastling() first.
-	 * @param kingSquare The square of the King
-	 * @param rookSquare The square of the Rook
+	 * 
+	 * @param kingSquare
+	 *            The square of the King
+	 * @param rookSquare
+	 *            The square of the Rook
 	 */
 	public void castle(Square kingSquare, Square rookSquare) {
 		int offset;
@@ -377,9 +532,13 @@ public class BoardManager {
 
 	/**
 	 * Checks if there are any obstacles between the pieces.
-	 * @param path The path between the pieces
-	 * @param initCoordinate Initial Coordinate to ignore
-	 * @param finalCoordinate Final Coordinate to ignore
+	 * 
+	 * @param path
+	 *            The path between the pieces
+	 * @param initCoordinate
+	 *            Initial Coordinate to ignore
+	 * @param finalCoordinate
+	 *            Final Coordinate to ignore
 	 * @return boolean Is path clear
 	 */
 	public boolean isPathClear(Coordinate[] path, Coordinate initCoordinate,
@@ -397,8 +556,11 @@ public class BoardManager {
 
 	/**
 	 * Checks if the piece can make a valid movement to the square.
-	 * @param initSquare Initial Square
-	 * @param finalSquare Final Square
+	 * 
+	 * @param initSquare
+	 *            Initial Square
+	 * @param finalSquare
+	 *            Final Square
 	 * @return boolean If movement is valid
 	 */
 	public boolean isValidMovement(Square initSquare, Square finalSquare) {
@@ -415,37 +577,44 @@ public class BoardManager {
 		}
 		// If the player tries to take his own piece.
 		if (finalSquare.isOccupied()) {
-			if (initSquare.getPiece().getPlayer() == finalSquare.getPiece().getPlayer())
+			if (initSquare.getPiece().getPlayer() == finalSquare.getPiece()
+					.getPlayer())
 				return false;
 		}
 
 		// Check all movements here. Normal Moves, Pawn Captures, Castling,
 		// EnPassant.
 		// If the piece cannot move to the square. No such movement.
-		if (!initSquare.getPiece().isValidMove(initSquare.getCoordinate(), finalSquare.getCoordinate())
+		if (!initSquare.getPiece().isValidMove(initSquare.getCoordinate(),
+				finalSquare.getCoordinate())
 				&& !isValidPawnCapture(initSquare, finalSquare)) {
 			return false;
 		}
 		// Pawns cannot capture forward.
-		if (initSquare.getPiece().getType() == PieceType.PAWN && finalSquare.isOccupied()
+		if (initSquare.getPiece().getType() == PieceType.PAWN
+				&& finalSquare.isOccupied()
 				&& !isValidPawnCapture(initSquare, finalSquare)) {
 			return false;
 		}
 
 		// If piece is blocked by other pieces
-		Coordinate[] path = initSquare.getPiece().getPath(initSquare.getCoordinate(),
-				finalSquare.getCoordinate());
-		if (!isPathClear(path, initSquare.getCoordinate(), finalSquare.getCoordinate())) {
+		Coordinate[] path = initSquare.getPiece().getPath(
+				initSquare.getCoordinate(), finalSquare.getCoordinate());
+		if (!isPathClear(path, initSquare.getCoordinate(),
+				finalSquare.getCoordinate())) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Checks if the given move is valid and safe.
-	 * Calls the isValidMovement() and moveMakesCheck().
-	 * @param initSquare The initial Square
-	 * @param finalSquare The final Square
+	 * Checks if the given move is valid and safe. Calls the isValidMovement()
+	 * and moveMakesCheck().
+	 * 
+	 * @param initSquare
+	 *            The initial Square
+	 * @param finalSquare
+	 *            The final Square
 	 * @return boolean Whether move is valid
 	 */
 	public boolean isValidMove(Square initSquare, Square finalSquare) {

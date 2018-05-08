@@ -2,5 +2,4 @@
 Add Enpassant
 Start new game after the previous has ended(A menu could work)
 Select piece for promotion.
-A function that checks for chekmate
 
