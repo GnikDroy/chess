@@ -225,7 +225,7 @@ public class BoardManager {
 		int validMoves=0;
 		for (int x=0;x<8;x++){
 			for (int y=0;y<8;y++){
-				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]) || isValidCastling(board.getSquare(coordinate),board.getSquares()[x][y]))
 				{
 					validMoves+=1;
 				}
@@ -236,7 +236,7 @@ public class BoardManager {
 		validMoves=0;
 		for (int x=0;x<8;x++){
 			for (int y=0;y<8;y++){
-				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]) || isValidCastling(board.getSquare(coordinate),board.getSquares()[x][y]))
 				{
 					moves[validMoves]=board.getSquares()[x][y];
 					validMoves++;

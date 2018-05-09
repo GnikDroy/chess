@@ -76,11 +76,17 @@ public class GameGUIEngine {
 		guiFrame.setVisible(true);
 
 	}
+	
+	public void highlightSquares(Square[] squares){
+		for(Square c:squares){
+			allButtons[7-c.getCoordinate().getY()][c.getCoordinate().getX()].setBackground(new Color(29, 114, 100));
+		}
+		
+	}
 	public void updateBoard() {
 		if(boardManager.isGameOver()){
 			boardManager.resetBoard();
 		}		
-		moveAI();
 
 		Square[][] squares = boardManager.getBoard().getSquares();
 		for (int row = 0; row < 8; row++) {
@@ -141,6 +147,7 @@ public class GameGUIEngine {
 				}
 			}
 		}}
+	
 	class MyActionListener implements ActionListener {
 
 
@@ -177,13 +184,17 @@ public class GameGUIEngine {
 										currentCoordinate), PieceType.QUEEN);
 					}
 					lastSelection = null;
+					moveAI();
 					updateBoard();
 				}
+				
 				
 				
 			}
 			
 			if (!moved) {
+				updateBoard();
+				highlightSquares(boardManager.getValidMoves(currentCoordinate));
 				lastSelection = button;
 			}
 
