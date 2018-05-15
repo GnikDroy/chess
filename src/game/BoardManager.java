@@ -342,7 +342,7 @@ public class BoardManager {
 	 * @param finalSquare
 	 *            Final Square
 	 */
-	public void enpassant(Square initSquare, Square finalSquare) {
+	private void enpassant(Square initSquare, Square finalSquare) {
 
 	}
 
@@ -355,7 +355,7 @@ public class BoardManager {
 	 *            Final Square
 	 * @return boolean If the move makes check.
 	 */
-	public boolean moveMakesCheck(Square initSquare, Square finalSquare) {
+	private boolean moveMakesCheck(Square initSquare, Square finalSquare) {
 		Piece temporaryPiece = finalSquare.getPiece();
 		finalSquare.setPiece(initSquare.getPiece());
 		initSquare.releasePiece();
@@ -378,7 +378,7 @@ public class BoardManager {
 	 *            The player whose king it is
 	 * @return Square The square of the king
 	 */
-	public Square squareOfKing(PlayerType player) {
+	private Square squareOfKing(PlayerType player) {
 		Square[][] squares = board.getSquares();
 		Square squareOfKing = null;
 		for (int x = 0; x < 8; x++) {
@@ -469,7 +469,7 @@ public class BoardManager {
 	 *            The square of the rook
 	 * @return boolean If this is valid Castling
 	 */
-	public boolean isValidCastling(Square kingSquare, Square rookSquare) {
+	private boolean isValidCastling(Square kingSquare, Square rookSquare) {
 		// Check if the squares are occupied.
 		if (!(kingSquare.isOccupied() && rookSquare.isOccupied())) {
 			return false;
@@ -508,7 +508,7 @@ public class BoardManager {
 							new Coordinate(0, col)) || rookSquare
 							.getCoordinate().equals(new Coordinate(7, col)))) {
 
-				// Check if there is check in any way between the king and rook
+				// Check if there is check in any way between the king and final king square
 				int offset;
 				if (Math.signum(rookSquare.getCoordinate().getX()
 						- kingSquare.getCoordinate().getX()) == 1) {
@@ -547,7 +547,7 @@ public class BoardManager {
 	 * @param rookSquare
 	 *            The square of the Rook
 	 */
-	public void castle(Square kingSquare, Square rookSquare) {
+	private void castle(Square kingSquare, Square rookSquare) {
 		int offset;
 		if (Math.signum(rookSquare.getCoordinate().getX()
 				- kingSquare.getCoordinate().getX()) == 1) {
@@ -596,7 +596,7 @@ public class BoardManager {
 	 *            Final Square
 	 * @return boolean If movement is valid
 	 */
-	public boolean isValidMovement(Square initSquare, Square finalSquare) {
+	private boolean isValidMovement(Square initSquare, Square finalSquare) {
 		// I am not checking if the squares have valid coordinate because, they
 		// should have it.
 		// If the player tries to move a empty square.

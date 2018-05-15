@@ -71,6 +71,9 @@ public class Pawn extends Piece {
 
 	@Override
 	public Coordinate[] getPath(Coordinate initPos, Coordinate finalPos) {
+		//This is for pawn captures
+		if (initPos.getX()!=finalPos.getX()){return new Coordinate[]{initPos,finalPos};}
+		//This is for normal pawn moves and first pawn moves.
 		int pathLength = Math.abs(initPos.getY() - finalPos.getY()) + 1;
 		Coordinate[] path = new Coordinate[pathLength];
 

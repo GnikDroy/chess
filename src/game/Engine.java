@@ -63,6 +63,22 @@ public class Engine {
 	{
 		this(20);
 	}
+	
+	
+	/**
+	 * Sets the level of difficulty of the engine
+	 * @param level The level of difficulty (0-20)
+	 */
+	public void setLevel(int level ){
+		stockfishLevel=level;
+		try {
+			stockfishInput.write("setoption name Skill Level value "+Integer.toString(stockfishLevel)+"\n");
+			stockfishInput.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	/**
 	 * This returns the best possible move 
 	 * If there is no possible move(Checkmate) then it send a blank string.(BUGGY)

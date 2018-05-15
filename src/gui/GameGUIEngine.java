@@ -24,7 +24,7 @@ public class GameGUIEngine {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
 	private JButton[][] allButtons = null;
-	private Engine stockfish=new Engine(20);
+	private Engine stockfish=new Engine(10);
 	private PlayerType humanPlayer=PlayerType.WHITE;
 
 	public static void main(String[] args) {
@@ -81,12 +81,9 @@ public class GameGUIEngine {
 		for(Square c:squares){
 			allButtons[7-c.getCoordinate().getY()][c.getCoordinate().getX()].setBackground(new Color(29, 114, 100));
 		}
-		
 	}
+
 	public void updateBoard() {
-		if(boardManager.isGameOver()){
-			boardManager.resetBoard();
-		}		
 
 		Square[][] squares = boardManager.getBoard().getSquares();
 		for (int row = 0; row < 8; row++) {
@@ -184,8 +181,10 @@ public class GameGUIEngine {
 										currentCoordinate), PieceType.QUEEN);
 					}
 					lastSelection = null;
+
 					moveAI();
 					updateBoard();
+
 				}
 				
 				
@@ -193,8 +192,13 @@ public class GameGUIEngine {
 			}
 			
 			if (!moved) {
+
 				updateBoard();
 				highlightSquares(boardManager.getValidMoves(currentCoordinate));
+				if(boardManager.isGameOver()){
+					boardManager.resetBoard();
+				}		
+
 				lastSelection = button;
 			}
 
