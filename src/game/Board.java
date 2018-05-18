@@ -136,6 +136,18 @@ public class Board {
 	}
 	
 	/**
+	 * Captures the piece that is present in the square.
+	 * @param square The square of the piece
+	 */
+	public void capturePiece(Square square){
+		if(square.isOccupied())
+		{
+			capturedPieces.add(square.getPiece());
+			square.releasePiece();
+		}
+	}
+	
+	/**
 	 * This makes a move from a square to another. **Move may be invalid**
 	 * @param initSquare The initial Square.
 	 * @param finalSquare The final Square
@@ -144,15 +156,11 @@ public class Board {
 		//Has a piece been captured;
 		if(finalSquare.isOccupied())
 		{
-			capturedPieces.add(finalSquare.getPiece());
-			finalSquare.getPiece().take();
-			finalSquare.releasePiece();
+			capturePiece(finalSquare);
 		}
 		//Make the move
 		finalSquare.setPiece(initSquare.getPiece());
 		initSquare.releasePiece();
-		
-
 	}
 	
 	/**

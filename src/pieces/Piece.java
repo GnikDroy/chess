@@ -11,7 +11,6 @@ import game.Coordinate;
 public abstract class Piece {
     private PieceType type;
     private PlayerType player;
-    private boolean isTaken=false;
 
     /**
      * Initialize a piece with a playerType.
@@ -28,20 +27,7 @@ public abstract class Piece {
      */
     public String toString(){
     	return player.toString()+type.toString();
-    }
-    
-
-    /**
-     * Sets the isTaken to true.
-     */
-    public void take(){isTaken=true;}
-    
-    /**
-     * Returns if the piece is taken or not.
-     * @return boolean If piece is taken
-     */
-    public boolean isTaken(){return isTaken;}
-    
+    }    
     
     /**
      * Returns the playerType.

@@ -1,5 +1,4 @@
 -------Feature---------------
 You cannot castle after you have moved your king or rook
-Add Enpassant
 Select piece for promotion.
 

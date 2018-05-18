@@ -301,14 +301,17 @@ public class BoardManager {
 		if (currentPlayer == s1.getPiece().getPlayer()) {
 			if (isValidCastling(s1, s2)) {
 				switchCurrentPlayer();
-				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
-						s1.getPiece().getType()));
+				Piece tmp=s1.getPiece();
 				castle(s1, s2);
+				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
+						tmp.getType()));
 				return true;
 			} else if (isValidEnpassant(s1, s2)) {
-				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
-						s1.getPiece().getType()));
+				Piece tmp=s1.getPiece();
 				enpassant(s1, s2);
+				switchCurrentPlayer();
+				moveList.add(new Move(s1.getCoordinate(), s2.getCoordinate(),
+						tmp.getType()));
 				return true;
 			} else if (isValidMove(s1, s2)) {
 				switchCurrentPlayer();
@@ -331,6 +334,41 @@ public class BoardManager {
 	 * @return boolean If enpassant valid
 	 */
 	public boolean isValidEnpassant(Square s1, Square s2) {
+		//The square should be empty
+		if(s2.isOccupied()){return false;}
+		
+		//The first piece should be a pawn.
+		if(s1.getPiece().getType()!=PieceType.PAWN){
+			return false;
+		}
+		//Move type is different according to player color
+		if (s1.getPiece().getPlayer()==PlayerType.WHITE){
+			if(s1.getCoordinate().getY()>s2.getCoordinate().getY()){
+				//White can only move forward
+				return false;
+			}
+		}
+		else{
+			if(s1.getCoordinate().getY()<s2.getCoordinate().getY()){
+				//Black can only move backward
+				return false;
+			}
+		}
+		//The move should be like a bishop move to a single square.
+		if(	Math.abs(s1.getCoordinate().getX()-s2.getCoordinate().getX())==1 &&
+			Math.abs(s1.getCoordinate().getY()-s2.getCoordinate().getY())==1	){
+			//There should be a pawn move before enpassant.
+
+			Move lastMove=moveList.get(moveList.size()-1);
+			if (board.getSquare(lastMove.getFinalCoordinate()).getPiece().getType()==PieceType.PAWN){
+				//The pawn should be moving two steps forward/backward.
+				//And our pawn should be moving to the same file as the last pawn 
+				if (Math.abs(lastMove.getFinalCoordinate().getY()-lastMove.getInitCoordinate().getY())==2 &&
+					lastMove.getFinalCoordinate().getX()==s2.getCoordinate().getX()){
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -343,7 +381,11 @@ public class BoardManager {
 	 *            Final Square
 	 */
 	private void enpassant(Square initSquare, Square finalSquare) {
-
+		Move lastMove=moveList.get(moveList.size()-1);
+		board.capturePiece(board.getSquare(lastMove.getFinalCoordinate()));
+		board.makeMove(initSquare,finalSquare);
+		
+		
 	}
 
 	/**
@@ -537,6 +579,19 @@ public class BoardManager {
 		return false;
 	}
 
+	
+	/**
+	 * This function undoes the previous move.
+	 * If there is no previous move then does nothing
+	 */
+	public void undoMove(){
+		if (moveList.isEmpty()){return;}
+		Move lastMove=moveList.get(moveList.size()-1);
+		board.makeMove( lastMove.getFinalCoordinate(),lastMove.getInitCoordinate());
+		moveList.remove(moveList.size()-1);
+		switchCurrentPlayer();
+	}
+	
 	/**
 	 * Makes a castle move.
 	 * <p>
@@ -615,8 +670,8 @@ public class BoardManager {
 				return false;
 		}
 
-		// Check all movements here. Normal Moves, Pawn Captures, Castling,
-		// EnPassant.
+		// Check all movements here. Normal Moves, Pawn Captures
+		// Castling and EnPassant are handled by the move function itself.
 		// If the piece cannot move to the square. No such movement.
 		if (!initSquare.getPiece().isValidMove(initSquare.getCoordinate(),
 				finalSquare.getCoordinate())
