@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
  * @author gnik
  *
  */
-public class Engine {
+public class Stockfish {
 	/**
 	 * This is the Stockfish process that runs in the background.
 	 */
@@ -35,7 +35,7 @@ public class Engine {
 	 * Also sets it in UCI_Chess960 mode with default options. Else it prints a stacktrace.
 	 * @param level The difficulty level from 0-20.
 	 */
-	public Engine(int level) {
+	public Stockfish(int level) {
 		stockfishLevel=level;
 		try {
 			stockfish = Runtime.getRuntime().exec("stockfish");
@@ -59,7 +59,7 @@ public class Engine {
 	/**
 	 * Starts a new engine at max difficulty. Same as Engine(20)
 	 */
-	public Engine()
+	public Stockfish()
 	{
 		this(20);
 	}

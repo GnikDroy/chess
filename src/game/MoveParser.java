@@ -34,7 +34,7 @@ public class MoveParser {
 	 */
 	private static String parseMove(Move move) {
 		if (move.getInitCoordinate().equals(move.getFinalCoordinate())) {
-			return move.getPiece().toString();
+			return move.getPiece().getType().toString();
 		}
 		return move.getInitCoordinate().getParsedCoordinate()
 				+ move.getFinalCoordinate().getParsedCoordinate();

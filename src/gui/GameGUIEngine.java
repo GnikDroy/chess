@@ -4,6 +4,7 @@ import game.BoardManager;
 import game.Coordinate;
 import game.MoveParser;
 import game.Square;
+import game.Stockfish;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,7 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import pieces.PieceType;
 import player.PlayerType;
-import game.Engine;
+
 
 /**
  * @author gnik
@@ -24,7 +25,7 @@ public class GameGUIEngine {
 	private BoardManager boardManager;
 	private JButton lastSelection = null;
 	private JButton[][] allButtons = null;
-	private Engine stockfish=new Engine(10);
+	private Stockfish stockfish=new Stockfish();
 	private PlayerType humanPlayer=PlayerType.WHITE;
 
 	public static void main(String[] args) {
@@ -33,6 +34,7 @@ public class GameGUIEngine {
 
 	public GameGUIEngine(PlayerType player) {
 		humanPlayer=player;
+		stockfish.setLevel(0);
 		boardManager = new BoardManager();
 		initialize();
 

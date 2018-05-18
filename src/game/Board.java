@@ -1,8 +1,8 @@
 package game;
+
 import pieces.*;
 import player.PlayerType;
 
-import java.util.*;
 
 
 /**
@@ -12,7 +12,6 @@ import java.util.*;
 public class Board {
 
 	private Square[][] squares=new Square[8][8];
-	private List<Piece> capturedPieces=new ArrayList<Piece>(16*2-2);
 
 	
 	/**
@@ -136,13 +135,20 @@ public class Board {
 	}
 	
 	/**
+	 * This set the piece in the specified coordinate
+	 * @param coordinate Coordinate of the piece
+	 * @param piece The piece object to be set.
+	 */
+	public void setPiece(Coordinate coordinate,Piece piece){
+		getSquare(coordinate).setPiece(piece);
+	}
+	/**
 	 * Captures the piece that is present in the square.
 	 * @param square The square of the piece
 	 */
 	public void capturePiece(Square square){
 		if(square.isOccupied())
 		{
-			capturedPieces.add(square.getPiece());
 			square.releasePiece();
 		}
 	}

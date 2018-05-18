@@ -45,6 +45,7 @@ public class GameGUI {
 		guiFrame.setLocationRelativeTo(null);
 
 		guiFrame.setLayout(new BorderLayout());
+
 		ChessWindow window = new ChessWindow(boardManager.getBoard()
 				.getSquares());
 
@@ -55,7 +56,6 @@ public class GameGUI {
 		guiFrame.setVisible(true);
 
 	}
-
 	class MyActionListener implements ActionListener {
 
 		public void updateBoard() {
@@ -234,8 +234,10 @@ public class GameGUI {
 					MyActionListener actionListener = new MyActionListener();
 					button.addActionListener(actionListener);
 					add(button, gbc);
+					
 
 				}
+				
 			}
 		}
 	}
