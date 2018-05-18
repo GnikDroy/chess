@@ -225,7 +225,7 @@ public class BoardManager {
 		int validMoves=0;
 		for (int x=0;x<8;x++){
 			for (int y=0;y<8;y++){
-				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]) || isValidCastling(board.getSquare(coordinate),board.getSquares()[x][y]))
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
 				{
 					validMoves+=1;
 				}
@@ -236,7 +236,7 @@ public class BoardManager {
 		validMoves=0;
 		for (int x=0;x<8;x++){
 			for (int y=0;y<8;y++){
-				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]) || isValidCastling(board.getSquare(coordinate),board.getSquares()[x][y]))
+				if (isValidMove(board.getSquare(coordinate),board.getSquares()[x][y]))
 				{
 					moves[validMoves]=board.getSquares()[x][y];
 					validMoves++;
@@ -333,7 +333,7 @@ public class BoardManager {
 	 *            Final Square
 	 * @return boolean If enpassant valid
 	 */
-	public boolean isValidEnpassant(Square s1, Square s2) {
+	private boolean isValidEnpassant(Square s1, Square s2) {
 		//The square should be empty
 		if(s2.isOccupied()){return false;}
 		
@@ -358,7 +358,7 @@ public class BoardManager {
 		if(	Math.abs(s1.getCoordinate().getX()-s2.getCoordinate().getX())==1 &&
 			Math.abs(s1.getCoordinate().getY()-s2.getCoordinate().getY())==1	){
 			//There should be a pawn move before enpassant.
-
+			if (moveList.isEmpty()){return false;}
 			Move lastMove=moveList.get(moveList.size()-1);
 			if (board.getSquare(lastMove.getFinalCoordinate()).getPiece().getType()==PieceType.PAWN){
 				//The pawn should be moving two steps forward/backward.
@@ -401,14 +401,27 @@ public class BoardManager {
 		Piece temporaryPiece = finalSquare.getPiece();
 		finalSquare.setPiece(initSquare.getPiece());
 		initSquare.releasePiece();
+		boolean enpassant=false;
+		Piece tmp=null;
+		Square lastMove=null;
+		//if it is a enpassant move then you must also remove a piece from the board temporarily.
+		if (isValidEnpassant(initSquare,finalSquare)){
+					enpassant=true;
+					lastMove=board.getSquare(moveList.get(moveList.size()-1).getFinalCoordinate());
+					tmp=lastMove.getPiece();
+					lastMove.releasePiece();
+		}
+				
+		
 		if (isCheck(finalSquare.getPiece().getPlayer())) {
 			initSquare.setPiece(finalSquare.getPiece());
 			finalSquare.setPiece(temporaryPiece);
-
+			if(enpassant){lastMove.setPiece(tmp);}
 			return true;
 		} else {
 			initSquare.setPiece(finalSquare.getPiece());
 			finalSquare.setPiece(temporaryPiece);
+			if(enpassant){lastMove.setPiece(tmp);}
 		}
 		return false;
 	}
@@ -501,7 +514,20 @@ public class BoardManager {
 		}
 		return false;
 	}
-
+	/**
+	 * @param square The square of the piece
+	 * @return boolean If this piece has been moved or captured.
+	 */
+	private boolean hasPieceMoved(Square square){
+		for(Move move:moveList)
+		{
+			if (move.getInitCoordinate()==square.getCoordinate() || move.getFinalCoordinate()==square.getCoordinate())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * Checks if it is valid Castling move
 	 * 
@@ -514,6 +540,10 @@ public class BoardManager {
 	private boolean isValidCastling(Square kingSquare, Square rookSquare) {
 		// Check if the squares are occupied.
 		if (!(kingSquare.isOccupied() && rookSquare.isOccupied())) {
+			return false;
+		}
+		//Check if the pieces have been moved or not.
+		if(hasPieceMoved(kingSquare) || hasPieceMoved(rookSquare)){
 			return false;
 		}
 		// You cannot castle if you are in check.
@@ -536,9 +566,10 @@ public class BoardManager {
 		}
 
 		// Now check if the movement of the castling is fine
+		//First check if the piece is king and rook
 		if (kingSquare.getPiece().getType() == PieceType.KING
-				&& rookSquare.getPiece().getType() == PieceType.ROOK) {
-
+				&& rookSquare.getPiece().getType() == PieceType.ROOK) {			
+			
 			int col = 0;
 			if (kingSquare.getPiece().getPlayer() == PlayerType.BLACK) {
 				col = 7;
@@ -581,18 +612,6 @@ public class BoardManager {
 
 	
 	/**
-	 * This function undoes the previous move.
-	 * If there is no previous move then does nothing
-	 */
-	public void undoMove(){
-		if (moveList.isEmpty()){return;}
-		Move lastMove=moveList.get(moveList.size()-1);
-		board.makeMove( lastMove.getFinalCoordinate(),lastMove.getInitCoordinate());
-		moveList.remove(moveList.size()-1);
-		switchCurrentPlayer();
-	}
-	
-	/**
 	 * Makes a castle move.
 	 * <p>
 	 * It calls the isValidCastling() first.
@@ -629,7 +648,7 @@ public class BoardManager {
 	 *            Final Coordinate to ignore
 	 * @return boolean Is path clear
 	 */
-	public boolean isPathClear(Coordinate[] path, Coordinate initCoordinate,
+	private boolean isPathClear(Coordinate[] path, Coordinate initCoordinate,
 			Coordinate finalCoordinate) {
 		Square[][] squares = board.getSquares();
 		for (Coordinate coordinate : path) {
@@ -670,12 +689,13 @@ public class BoardManager {
 				return false;
 		}
 
-		// Check all movements here. Normal Moves, Pawn Captures
-		// Castling and EnPassant are handled by the move function itself.
+		// Check all movements here. Normal Moves, Pawn Captures and Enpassant.
+		// Castling are handled by the move function itself.
 		// If the piece cannot move to the square. No such movement.
 		if (!initSquare.getPiece().isValidMove(initSquare.getCoordinate(),
 				finalSquare.getCoordinate())
-				&& !isValidPawnCapture(initSquare, finalSquare)) {
+				&& !isValidPawnCapture(initSquare, finalSquare)
+				&& !isValidEnpassant(initSquare,finalSquare)) {
 			return false;
 		}
 		// Pawns cannot capture forward.
@@ -706,7 +726,9 @@ public class BoardManager {
 	 * @return boolean Whether move is valid
 	 */
 	public boolean isValidMove(Square initSquare, Square finalSquare) {
-
+		if(isValidCastling(initSquare,finalSquare)){
+			return true;
+		}
 		if (!isValidMovement(initSquare, finalSquare)) {
 			return false;
 		}
