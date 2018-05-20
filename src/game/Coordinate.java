@@ -27,7 +27,7 @@ public class Coordinate {
 	 * @param coordinate The coordinate in string format (UCI)
 	 */
 	public Coordinate(String coordinate){
-		positionX=(char)coordinate.toCharArray()[0]-97;
+		positionX=(char)coordinate.toCharArray()[0]-'a';
 		positionY=Integer.parseInt(coordinate.substring(1,2))-1;
 		
 	}
@@ -37,11 +37,7 @@ public class Coordinate {
 	 * @return boolean If coordinate is valid
 	 */
 	public boolean isValid() {
-		if ((positionX >= 0 && positionX < 8)
-				&& (positionY >= 0 && positionY < 8)) {
-			return true;
-		}
-		return false;
+		return (positionX >= 0 && positionX < 8) && (positionY >= 0 && positionY < 8);
 	}
 
 	/**
@@ -113,7 +109,7 @@ public class Coordinate {
 	 */
 	public String getParsedCoordinate() {
 		String parsedString = "";
-		parsedString = (char) (positionX + 97)
+		parsedString = (char) (positionX + 'a')
 				+ Integer.toString(positionY + 1);
 		return parsedString;
 	}
