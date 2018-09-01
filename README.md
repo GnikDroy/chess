@@ -5,7 +5,7 @@ In single player mode the player plays against the stockfish engine. Hence you n
 
 # How it looks
 
-![Chess]((https://raw.githubusercontent.com/GnikDroy/chess/master/screenshots/screenshot.png)
+![Chess](https://raw.githubusercontent.com/GnikDroy/chess/master/screenshots/screenshot.png)
 
 # Requirements
 
