@@ -1,7 +1,0 @@
-Requirements for the program.
--The program requires the following packages to be installed
-	- stockfish
-
-In Linux
-->sudo apt-get install stockfish
-
